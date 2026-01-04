@@ -1,3 +1,4 @@
+import { Outlet } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
 
 export default function Dashboard() {
@@ -6,11 +7,9 @@ export default function Dashboard() {
       <Sidebar />
 
       <main className="dashboard-main">
-        <h1>Dashboard</h1>
-        <p className="muted">
-          Select a tool from the sidebar to get started.
-        </p>
+        <Outlet />
       </main>
     </div>
   );
 }
+

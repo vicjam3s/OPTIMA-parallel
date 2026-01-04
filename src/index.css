@@ -355,5 +355,131 @@ body {
   }
 }
 
+/* ================= NOTES FEATURE ================= */
+
+.notes-page {
+  max-width: 900px;
+}
+
+.notes-input {
+  margin-top: 1.5rem;
+  width: 100%;
+  min-height: 300px;
+  padding: 1.25rem;
+  font-size: 1rem;
+  line-height: 1.6;
+  border-radius: 12px;
+  border: 1px solid #1e293b;
+  background: #020617;
+  color: #e5e7eb;
+  resize: vertical;
+}
+
+.notes-input::placeholder {
+  color: #64748b;
+}
+
+.notes-input:focus {
+  outline: none;
+  border-color: #818cf8;
+}
+
+/* ================= FOCUS TIMER ================= */
+
+.focus-page {
+  max-width: 600px;
+}
+
+.timer-display {
+  margin: 2rem 0;
+  font-size: 4rem;
+  font-weight: 700;
+  color: #818cf8;
+  letter-spacing: 2px;
+}
+
+.timer-controls {
+  display: flex;
+  gap: 1rem;
+}
+/* ---------- RESET BUTTON ---------- */
+
+.btn.reset {
+  background: transparent;
+  color: #94a3b8;            /* muted slate */
+  border: 1px solid #1e293b;
+}
+
+.btn.reset:hover {
+  background: rgba(148, 163, 184, 0.08);
+  color: #e5e7eb;
+  border-color: #64748b;
+}
+
+/* ================= E-LIBRARY ================= */
+
+.library-page {
+  max-width: 1000px;
+}
+
+.library-search {
+  margin: 1.5rem 0 2rem;
+  display: flex;
+  gap: 0.75rem;
+}
+
+.library-search input {
+  flex: 1;
+  padding: 0.7rem 0.9rem;
+  border-radius: 8px;
+  border: 1px solid #1e293b;
+  background: #020617;
+  color: #e5e7eb;
+  font-size: 0.95rem;
+}
+
+.library-search input::placeholder {
+  color: #64748b;
+}
+
+.library-search input:focus {
+  outline: none;
+  border-color: #818cf8;
+}
+
+.library-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1rem;
+}
+
+.book-card {
+  background: #020617;
+  border: 1px solid #1e293b;
+  border-radius: 14px;
+  padding: 1.25rem;
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.book-card:hover {
+  transform: translateY(-4px);
+  border-color: #818cf8;
+}
+
+.book-card h3 {
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.book-card .year {
+  margin-top: 0.5rem;
+  font-size: 0.8rem;
+  color: #64748b;
+}
+
+.error {
+  color: #f87171;
+  margin-top: 1rem;
+}
 
 
