@@ -1,3 +1,42 @@
+/* ================= DESIGN TOKENS ================= */
+:root {
+  --bg-main: #020617;
+  --bg-surface: #020617;
+  --border-subtle: #1e293b;
+
+  --text-main: #e5e7eb;
+  --text-muted: #94a3b8;
+
+  --accent: #818cf8;
+  --accent-soft: #a5b4fc;
+
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+
+  --space-1: 0.5rem;
+  --space-2: 0.75rem;
+  --space-3: 1rem;
+  --space-4: 1.5rem;
+  --space-5: 2rem;
+}
+
+/* ================= PAGE WRAPPER ================= */
+
+.dashboard-main > div {
+  animation: fadeUp 0.25s ease;
+}
+
+h1 {
+  margin-bottom: var(--space-2);
+  font-size: 2rem;
+}
+
+.muted {
+  color: var(--text-muted);
+  margin-bottom: var(--space-4);
+}
+
 /* ---------- COLORS ---------- */
 :root {
   --bg-main: #020617;
@@ -454,16 +493,13 @@ body {
 }
 
 .book-card {
-  background: #020617;
-  border: 1px solid #1e293b;
-  border-radius: 14px;
-  padding: 1.25rem;
-  transition: transform 0.2s ease, border-color 0.2s ease;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
 }
 
 .book-card:hover {
-  transform: translateY(-4px);
-  border-color: #818cf8;
+  border-color: var(--accent);
 }
 
 .book-card h3 {
@@ -480,6 +516,234 @@ body {
 .error {
   color: #f87171;
   margin-top: 1rem;
+}
+
+/* ================= MOVIES ================= */
+
+.movies-page {
+  max-width: 1100px;
+}
+
+.movies-search {
+  margin: 1.5rem 0 2rem;
+  display: flex;
+  gap: 0.75rem;
+}
+
+.movies-search input {
+  flex: 1;
+  padding: 0.7rem 0.9rem;
+  border-radius: 8px;
+  border: 1px solid #1e293b;
+  background: #020617;
+  color: #e5e7eb;
+}
+
+.movies-search input:focus {
+  outline: none;
+  border-color: #818cf8;
+}
+
+.movies-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 1.25rem;
+}
+
+.movie-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+}
+
+.movie-card:hover {
+  border-color: var(--accent);
+}
+
+.movie-card img {
+  width: 100%;
+  height: 270px;
+  object-fit: cover;
+}
+
+.poster-placeholder {
+  height: 270px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #64748b;
+  font-size: 0.9rem;
+  background: #020617;
+}
+
+.movie-info {
+  padding: 0.9rem;
+}
+
+.movie-info h3 {
+  font-size: 0.95rem;
+  margin-bottom: 0.25rem;
+}
+
+.rating {
+  margin-top: 0.25rem;
+  font-size: 0.85rem;
+  color: #facc15;
+}
+
+/* ================= MUSIC ================= */
+
+.music-page {
+  max-width: 1100px;
+}
+
+.playlist-grid {
+  margin-top: 2rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.25rem;
+}
+
+.playlist-grid iframe {
+  width: 100%;
+  height: 380px;
+  border-radius: 14px;
+  border: none;
+}
+/* ================= CALENDAR ================= */
+
+.calendar-page {
+  max-width: 1100px;
+}
+
+.calendar-embed {
+  margin-top: 1.5rem;
+  width: 100%;
+  height: 600px;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid #1e293b;
+}
+
+.calendar-embed iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+/* ================= TASKS ================= */
+
+.tasks-section {
+  margin-top: 2.5rem;
+  max-width: 600px;
+}
+
+.tasks-input {
+  display: flex;
+  gap: 0.75rem;
+  margin: 1rem 0;
+}
+
+.tasks-input input {
+  flex: 1;
+  padding: 0.6rem 0.8rem;
+  border-radius: 8px;
+  border: 1px solid #1e293b;
+  background: #020617;
+  color: #e5e7eb;
+}
+
+.tasks-list {
+  list-style: none;
+  padding: 0;
+}
+
+.tasks-list li {
+  padding: 0.6rem 0.8rem;
+  border-radius: 8px;
+  border: 1px solid #1e293b;
+  margin-bottom: 0.5rem;
+  cursor: pointer;
+}
+
+.tasks-list li.done {
+  text-decoration: line-through;
+  color: #64748b;
+}
+/* ================= NEWS ================= */
+
+.news-page {
+  max-width: 900px;
+}
+
+.news-list {
+  margin-top: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.news-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+}
+
+.news-card h3 {
+  font-size: 1.05rem;
+  margin-bottom: 0.5rem;
+}
+
+.news-source {
+  font-size: 0.8rem;
+  color: #64748b;
+  margin-bottom: 0.5rem;
+}
+
+.news-desc {
+  font-size: 0.95rem;
+  color: #e5e7eb;
+  margin-bottom: 1rem;
+  line-height: 1.5;
+}
+
+.news-link {
+  text-decoration: none;
+  color: #818cf8;
+  font-size: 0.9rem;
+}
+
+.news-link:hover {
+  text-decoration: underline;
+}
+
+input,
+textarea {
+  border-radius: var(--radius-md);
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+input:focus,
+textarea:focus {
+  border-color: var(--accent);
+}
+.btn {
+  border-radius: 999px;
+  padding: 0.6rem 1.25rem;
+  font-weight: 600;
+  transition: transform 0.15s ease, background 0.2s ease;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+}
+
+.btn.primary {
+  background: var(--accent);
+  color: #020617;
+}
+
+.btn.primary:hover {
+  background: var(--accent-soft);
 }
 
 
