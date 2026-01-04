@@ -115,6 +115,140 @@ body {
   color: var(--text-muted);
 }
 
+/* ================= NAVBAR ================= */
+
+.navbar-wrapper {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background: rgba(2, 6, 23, 0.75);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid #1e293b;
+}
+
+.navbar {
+  max-width: 1200px;
+  height: 72px;
+  margin: 0 auto;
+  padding: 0 2rem;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Logo */
+.logo {
+  font-size: 1.5rem;
+  font-weight: 800;
+  letter-spacing: 1px;
+  color: #818cf8;
+  text-decoration: none;
+}
+
+/* Desktop links */
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.nav-item {
+  text-decoration: none;
+  color: #e5e7eb;
+  font-size: 0.95rem;
+  padding: 0.45rem 0.9rem;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.nav-item:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: #a5b4fc;
+}
+
+/* Active route */
+.nav-item.active {
+  color: #a5b4fc;
+}
+
+/* CTA button */
+.nav-item.cta {
+  background: #818cf8;
+  color: #020617;
+  font-weight: 600;
+}
+
+.nav-item.cta:hover {
+  background: #a5b4fc;
+}
+
+/* Hamburger */
+.menu-btn {
+  display: none;
+  font-size: 1.7rem;
+  background: none;
+  border: none;
+  color: #e5e7eb;
+  cursor: pointer;
+}
+
+/* ================= MOBILE ================= */
+
+.mobile-nav {
+  background: #020617;
+  border-top: 1px solid #1e293b;
+  display: flex;
+  flex-direction: column;
+  padding: 0.75rem 1.25rem;
+  animation: slideDown 0.25s ease;
+}
+
+.mobile-item {
+  padding: 0.75rem 0;
+  text-decoration: none;
+  color: #e5e7eb;
+  border-radius: 6px;
+}
+
+.mobile-item:hover {
+  color: #a5b4fc;
+}
+
+.mobile-item.cta {
+  margin-top: 0.5rem;
+  background: #818cf8;
+  color: #020617;
+  text-align: center;
+  padding: 0.65rem;
+  border-radius: 8px;
+  font-weight: 600;
+}
+
+/* ================= BREAKPOINT ================= */
+
+@media (max-width: 768px) {
+  .desktop {
+    display: none;
+  }
+
+  .menu-btn {
+    display: block;
+  }
+}
+
+/* ================= ANIMATION ================= */
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 
 
 

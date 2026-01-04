@@ -1,11 +1,17 @@
+import { useAuth } from "../context/AuthContext";
+
 export default function Dashboard() {
+  const { user, logout } = useAuth();
+
   return (
-    <section className="dashboard">
-      <h2>Welcome to OPTIMA</h2>
-      <p className="muted">
-        Choose a tool to begin your study session.
-      </p>
+    <section className="page">
+      <h2>Welcome, {user?.displayName}</h2>
+
+      <button className="btn secondary" onClick={logout}>
+        Logout
+      </button>
     </section>
   );
 }
+
 
