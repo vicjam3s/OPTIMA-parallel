@@ -1,17 +1,16 @@
-import { useAuth } from "../context/AuthContext";
+import Sidebar from "../components/Sidebar";
 
 export default function Dashboard() {
-  const { user, logout } = useAuth();
-
   return (
-    <section className="page">
-      <h2>Welcome, {user?.displayName}</h2>
+    <div className="dashboard-layout">
+      <Sidebar />
 
-      <button className="btn secondary" onClick={logout}>
-        Logout
-      </button>
-    </section>
+      <main className="dashboard-main">
+        <h1>Dashboard</h1>
+        <p className="muted">
+          Select a tool from the sidebar to get started.
+        </p>
+      </main>
+    </div>
   );
 }
-
-

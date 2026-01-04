@@ -1,20 +1,21 @@
-import { signInWithPopup } from "firebase/auth";
-import { auth, googleProvider } from "../services/firebase";
 import { useNavigate } from "react-router-dom";
 
 export default function Signup() {
   const navigate = useNavigate();
 
-  const signup = async () => {
-    await signInWithPopup(auth, googleProvider);
-    navigate("/dashboard");
-  };
-
   return (
-    <section className="page center">
-      <button className="btn primary" onClick={signup}>
-        Sign up with Google
-      </button>
+    <section className="auth-page">
+      <div className="auth-card">
+        <h2>Create an Account</h2>
+        <p className="muted">Sign-up coming soon</p>
+
+        <button
+          className="btn primary full"
+          onClick={() => navigate("/dashboard")}
+        >
+          Get Started (Demo)
+        </button>
+      </div>
     </section>
   );
 }

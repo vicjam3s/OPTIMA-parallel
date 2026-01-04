@@ -2,16 +2,17 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import App from "./App";
-import { AuthProvider } from "./context/AuthContext";
+import { FakeAuthProvider } from "./context/FakeAuthContext";
 import "./index.css";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <BrowserRouter>
-      <AuthProvider>
+      <FakeAuthProvider>
         <App />
-      </AuthProvider>
+      </FakeAuthProvider>
     </BrowserRouter>
   </React.StrictMode>
 );
+
 

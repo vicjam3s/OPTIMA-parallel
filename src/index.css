@@ -250,5 +250,38 @@ body {
   }
 }
 
+/* ---------- AUTH PAGES ---------- */
+
+.auth-page {
+  min-height: calc(100vh - 72px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.auth-card {
+  background: #020617;
+  border: 1px solid #1e293b;
+  padding: 2.5rem;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 360px;
+  text-align: center;
+}
+
+.auth-card h2 {
+  margin-bottom: 0.75rem;
+}
+
+.auth-card .muted {
+  color: #94a3b8;
+  font-size: 0.9rem;
+  margin-bottom: 2rem;
+}
+
+.btn.full {
+  width: 100%;
+}
+
 
 
