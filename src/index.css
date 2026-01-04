@@ -1,0 +1,71 @@
+/* RESET */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* BASE THEME */
+body {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  background-color: #020617; /* dark navy */
+  color: #e5e7eb; /* light text */
+  min-height: 100vh;
+}
+
+/* UTILITY */
+.center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+/* NAVBAR */
+.navbar {
+  position: sticky;
+  top: 0;
+  height: 64px;
+  background: #020617;
+  border-bottom: 1px solid #1e293b;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 2rem;
+  z-index: 100;
+}
+
+.logo {
+  color: #818cf8;
+  font-weight: bold;
+}
+
+.nav-links a {
+  margin-left: 1.5rem;
+  color: #e5e7eb;
+  text-decoration: none;
+}
+
+.nav-links a:hover {
+  color: #a5b4fc;
+}
+
+/* PAGES */
+.page {
+  padding: 2rem;
+  min-height: calc(100vh - 64px);
+}
+
+.text-center {
+  text-align: center;
+}
+
+h1 {
+  font-size: 3rem;
+  color: #818cf8;
+}
+
+h2 {
+  font-size: 2rem;
+}
+
+
+
