@@ -283,5 +283,77 @@ body {
   width: 100%;
 }
 
+/* ================= DASHBOARD LAYOUT ================= */
+
+.dashboard-layout {
+  display: flex;
+  min-height: calc(100vh - 72px);
+}
+
+/* ---------- SIDEBAR ---------- */
+
+.sidebar {
+  width: 240px;
+  background: #020617;
+  border-right: 1px solid #1e293b;
+  padding: 2rem 1.5rem;
+}
+
+.sidebar-logo {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: #818cf8;
+  margin-bottom: 2rem;
+}
+
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.sidebar-link {
+  text-decoration: none;
+  color: #e5e7eb;
+  padding: 0.6rem 0.8rem;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.sidebar-link:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: #a5b4fc;
+}
+
+.sidebar-link.active {
+  background: rgba(129, 140, 248, 0.15);
+  color: #a5b4fc;
+}
+
+/* ---------- MAIN CONTENT ---------- */
+
+.dashboard-main {
+  flex: 1;
+  padding: 2.5rem;
+}
+
+.dashboard-main h1 {
+  font-size: 2.2rem;
+  color: #818cf8;
+}
+
+/* ---------- RESPONSIVE ---------- */
+
+@media (max-width: 900px) {
+  .sidebar {
+    display: none;
+  }
+
+  .dashboard-layout {
+    flex-direction: column;
+  }
+}
+
 
 
