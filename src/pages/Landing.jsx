@@ -1,29 +1,64 @@
+import { useNavigate } from "react-router-dom";
+
 export default function Landing() {
+  const navigate = useNavigate();
+
   return (
     <section className="landing">
-      <div className="hero">
-        <h1>OPTIMA</h1>
-        <p>
-          A smart productivity platform designed to help students
-          study better, stay focused, and stay informed.
-        </p>
-
-        <div className="hero-actions">
-          <a href="/signup" className="btn primary">Get Started</a>
-          <a href="/login" className="btn secondary">Login</a>
-        </div>
-      </div>
+      {/* hero stays the same */}
 
       <div className="features">
-        <div className="feature-card">📚 E-Library</div>
-        <div className="feature-card">🎧 Study Music</div>
-        <div className="feature-card">⏱ Focus Timer</div>
-        <div className="feature-card">🎬 Movies & Series</div>
-        <div className="feature-card">🗓 Calendar & Tasks</div>
-        <div className="feature-card">📰 Daily News</div>
-        <div className="feature-card">📝 Notes</div>
+        <div
+          className="feature-card library"
+          onClick={() => navigate("/dashboard/library")}
+        >
+          <span>📚 E-Library</span>
+        </div>
+
+        <div
+          className="feature-card music"
+          onClick={() => navigate("/dashboard/music")}
+        >
+          <span>🎧 Study Music</span>
+        </div>
+
+        <div
+          className="feature-card focus"
+          onClick={() => navigate("/dashboard/focus")}
+        >
+          <span>⏱ Focus Timer</span>
+        </div>
+
+        <div
+          className="feature-card movies"
+          onClick={() => navigate("/dashboard/movies")}
+        >
+          <span>🎬 Movies & Series</span>
+        </div>
+
+        <div
+          className="feature-card calendar"
+          onClick={() => navigate("/dashboard/calendar")}
+        >
+          <span>🗓 Calendar & Tasks</span>
+        </div>
+
+        <div
+          className="feature-card news"
+          onClick={() => navigate("/dashboard/news")}
+        >
+          <span>📰 Daily News</span>
+        </div>
+
+        <div
+          className="feature-card notes"
+          onClick={() => navigate("/dashboard/notes")}
+        >
+          <span>📝 Notes</span>
+        </div>
       </div>
     </section>
   );
 }
+
 
