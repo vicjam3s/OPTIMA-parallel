@@ -3,34 +3,36 @@ import { NavLink } from "react-router-dom";
 export default function Sidebar() {
   return (
     <aside className="sidebar">
-      <h2 className="sidebar-logo">OPTIMA</h2>
-
       <nav className="sidebar-nav">
-        <NavLink to="/dashboard" end className="sidebar-link">
-          Dashboard
+        <NavLink to="/library" className="sidebar-btn">
+          <span>📚</span>
         </NavLink>
-        <NavLink to="/dashboard/library" className="sidebar-link">
-          📚 E-Library
+
+        <NavLink to="/music" className="sidebar-btn">
+          <span>🎧</span>
         </NavLink>
-        <NavLink to="/dashboard/music" className="sidebar-link">
-          🎧 Music
+
+        <NavLink to="/focus" className="sidebar-btn">
+          <span>⏱</span>
         </NavLink>
-        <NavLink to="/dashboard/focus" className="sidebar-link">
-          ⏱ Focus
+
+        <NavLink to="/movies" className="sidebar-btn">
+          <span>🎬</span>
         </NavLink>
-        <NavLink to="/dashboard/movies" className="sidebar-link">
-          🎬 Movies
+
+        <NavLink to="/calendar" className="sidebar-btn">
+          <span>🗓</span>
         </NavLink>
-        <NavLink to="/dashboard/calendar" className="sidebar-link">
-          🗓 Calendar
+
+        <NavLink to="/news" className="sidebar-btn">
+          <span>📰</span>
         </NavLink>
-        <NavLink to="/dashboard/news" className="sidebar-link">
-          📰 News
-        </NavLink>
-        <NavLink to="/dashboard/notes" className="sidebar-link">
-          📝 Notes
+
+        <NavLink to="/notes" className="sidebar-btn">
+          <span>📝</span>
         </NavLink>
       </nav>
     </aside>
   );
 }
+

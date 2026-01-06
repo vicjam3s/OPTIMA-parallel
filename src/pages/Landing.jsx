@@ -10,49 +10,49 @@ export default function Landing() {
       <div className="features">
         <div
           className="feature-card library"
-          onClick={() => navigate("/dashboard/library")}
+          onClick={() => navigate("/library")}
         >
           <span>📚 E-Library</span>
         </div>
 
         <div
           className="feature-card music"
-          onClick={() => navigate("/dashboard/music")}
+          onClick={() => navigate("/music")}
         >
           <span>🎧 Study Music</span>
         </div>
 
         <div
           className="feature-card focus"
-          onClick={() => navigate("/dashboard/focus")}
+          onClick={() => navigate("/focus")}
         >
           <span>⏱ Focus Timer</span>
         </div>
 
         <div
           className="feature-card movies"
-          onClick={() => navigate("/dashboard/movies")}
+          onClick={() => navigate("/movies")}
         >
           <span>🎬 Movies & Series</span>
         </div>
 
         <div
           className="feature-card calendar"
-          onClick={() => navigate("/dashboard/calendar")}
+          onClick={() => navigate("/calendar")}
         >
           <span>🗓 Calendar & Tasks</span>
         </div>
 
         <div
           className="feature-card news"
-          onClick={() => navigate("/dashboard/news")}
+          onClick={() => navigate("/news")}
         >
           <span>📰 Daily News</span>
         </div>
 
         <div
           className="feature-card notes"
-          onClick={() => navigate("/dashboard/notes")}
+          onClick={() => navigate("/notes")}
         >
           <span>📝 Notes</span>
         </div>

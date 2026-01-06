@@ -1,42 +1,55 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useLocation } from "react-router-dom";
+import Sidebar from "./components/Sidebar";
 import Navbar from "./components/Navbar";
+
 import Landing from "./pages/Landing";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
-import Dashboard from "./pages/Dashboard";
 
-// dashboard pages
-import DashboardHome from "./pages/dashboard/DashboardHome";
-import Library from "./pages/dashboard/Library";
-import Music from "./pages/dashboard/Music";
-import Focus from "./pages/dashboard/Focus";
-import Movies from "./pages/dashboard/Movies";
-import Calendar from "./pages/dashboard/Calendar";
-import News from "./pages/dashboard/News";
-import Notes from "./pages/dashboard/Notes";
+import Notes from "./pages/Notes";
+import Focus from "./pages/Focus";
+import Library from "./pages/Library";
+import Movies from "./pages/Movies";
+import Music from "./pages/Music";
+import News from "./pages/News";
+import Calendar from "./pages/Calendar";
 
 export default function App() {
+  const location = useLocation();
+
+  // Routes where sidebar should be hidden
+  const hideSidebarRoutes = ["/", "/login", "/signup"];
+  const showSidebar = !hideSidebarRoutes.includes(location.pathname);
+
   return (
     <>
       <Navbar />
-      <Routes>
-        <Route path="/" element={<Landing />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
 
-        <Route path="/dashboard" element={<Dashboard />}>
-          <Route index element={<DashboardHome />} />
-          <Route path="library" element={<Library />} />
-          <Route path="music" element={<Music />} />
-          <Route path="focus" element={<Focus />} />
-          <Route path="movies" element={<Movies />} />
-          <Route path="calendar" element={<Calendar />} />
-          <Route path="news" element={<News />} />
-          <Route path="notes" element={<Notes />} />
-        </Route>
-      </Routes>
+      <div className={showSidebar ? "app-layout" : ""}>
+        {showSidebar && <Sidebar />}
+
+        <main className="app-main">
+          <Routes>
+            <Route path="/" element={<Landing />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
+
+            <Route path="/notes" element={<Notes />} />
+            <Route path="/focus" element={<Focus />} />
+            <Route path="/library" element={<Library />} />
+            <Route path="/movies" element={<Movies />} />
+            <Route path="/music" element={<Music />} />
+            <Route path="/news" element={<News />} />
+            <Route path="/calendar" element={<Calendar />} />
+          </Routes>
+        </main>
+      </div>
     </>
   );
 }
+
+
+
+
 
 
