@@ -3,7 +3,7 @@ export default function DashboardHome() {
     <>
       <h1>Dashboard</h1>
       <p className="muted">
-        Select a tool from the sidebar to get started.
+        Lets get started.
       </p>
     </>
   );
