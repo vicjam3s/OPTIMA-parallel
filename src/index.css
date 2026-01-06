@@ -126,7 +126,7 @@ body {
 .features {
   margin-top: 5rem;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr, 1fr));
+  grid-template-columns: 1fr 1fr;
   align-items: center;
   gap: 1.25rem;
   max-width: 900px;
@@ -851,3 +851,8 @@ textarea:focus {
   }
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .feature-card {
+    transition: none;
+  }
+}
