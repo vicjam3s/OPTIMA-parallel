@@ -1,6 +1,7 @@
 import { Routes, Route, useLocation } from "react-router-dom";
-import Sidebar from "./components/Sidebar";
 import Navbar from "./components/Navbar";
+import Sidebar from "./components/Sidebar";
+import BackToTop from "./components/BackToTop";
 
 import Landing from "./pages/Landing";
 import Login from "./pages/Login";
@@ -17,16 +18,16 @@ import Calendar from "./pages/Calendar";
 export default function App() {
   const location = useLocation();
 
-  // Routes where sidebar should be hidden
-  const hideSidebarRoutes = ["/", "/login", "/signup"];
-  const showSidebar = !hideSidebarRoutes.includes(location.pathname);
+  // Routes where sidebar & back-to-top should NOT show
+  const hideUIRoutes = ["/", "/login", "/signup"];
+  const showFeatureUI = !hideUIRoutes.includes(location.pathname);
 
   return (
     <>
       <Navbar />
 
-      <div className={showSidebar ? "app-layout" : ""}>
-        {showSidebar && <Sidebar />}
+      <div className={showFeatureUI ? "app-layout" : ""}>
+        {showFeatureUI && <Sidebar />}
 
         <main className="app-main">
           <Routes>
@@ -44,10 +45,11 @@ export default function App() {
           </Routes>
         </main>
       </div>
+
+      {showFeatureUI && <BackToTop />}
     </>
   );
 }
-
 
 
 
