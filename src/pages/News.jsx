@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const CACHE_KEY = "optima_news_cache";
 const BOOKMARK_KEY = "optima_saved_news";
@@ -12,18 +12,53 @@ const categories = [
   { label: "Health", value: "health" },
 ];
 
+/* ================= LAZY CARD ================= */
+
+function LazyNewsCard({ article, children, className }) {
+  const ref = useRef(null);
+  const [loaded, setLoaded] = useState(false);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => entry.isIntersecting && setLoaded(true),
+      { threshold: 0.15 }
+    );
+
+    if (ref.current) observer.observe(ref.current);
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <article
+      ref={ref}
+      className={className}
+      style={{
+        backgroundImage:
+          loaded && article.image
+            ? `url(${article.image})`
+            : "linear-gradient(135deg, #020617, #020617)",
+      }}
+    >
+      {children}
+    </article>
+  );
+}
+
+/* ================= MAIN ================= */
+
 export default function News() {
   const [articles, setArticles] = useState([]);
   const [saved, setSaved] = useState([]);
   const [category, setCategory] = useState("general");
   const [query, setQuery] = useState("");
+  const [selectedArticle, setSelectedArticle] = useState(null);
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
   /* ---------- LOAD SAVED ---------- */
   useEffect(() => {
-    const stored = JSON.parse(localStorage.getItem(BOOKMARK_KEY)) || [];
-    setSaved(stored);
+    setSaved(JSON.parse(localStorage.getItem(BOOKMARK_KEY)) || []);
   }, []);
 
   /* ---------- LOAD CACHE ---------- */
@@ -36,48 +71,41 @@ export default function News() {
 
   useEffect(() => {
     fetchNews();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line
   }, [category]);
 
-  const fetchNews = async (searchTerm = "") => {
+  const fetchNews = async (search = "") => {
     setLoading(true);
     setError("");
 
     try {
-      const url = searchTerm
+      const url = search
         ? `https://gnews.io/api/v4/search?q=${encodeURIComponent(
-            searchTerm
+            search
           )}&country=ke&max=10&token=${import.meta.env.VITE_GNEWS_API_KEY}`
         : `https://gnews.io/api/v4/top-headlines?country=ke&topic=${category}&max=10&token=${import.meta.env.VITE_GNEWS_API_KEY}`;
 
       const res = await fetch(url);
       const data = await res.json();
-
-      if (!res.ok) throw new Error(data.message);
+      if (!res.ok) throw new Error();
 
       setArticles(data.articles || []);
-
       localStorage.setItem(
         CACHE_KEY,
         JSON.stringify({ time: Date.now(), data: data.articles })
       );
-    } catch (err) {
+    } catch {
       setError("Unable to load news.");
     } finally {
       setLoading(false);
     }
   };
 
-  /* ---------- BOOKMARK LOGIC ---------- */
   const toggleSave = (article) => {
     const exists = saved.some((a) => a.url === article.url);
-
-    let updated;
-    if (exists) {
-      updated = saved.filter((a) => a.url !== article.url);
-    } else {
-      updated = [...saved, article];
-    }
+    const updated = exists
+      ? saved.filter((a) => a.url !== article.url)
+      : [...saved, article];
 
     setSaved(updated);
     localStorage.setItem(BOOKMARK_KEY, JSON.stringify(updated));
@@ -102,7 +130,6 @@ export default function News() {
       {/* SEARCH */}
       <form className="news-search" onSubmit={handleSearch}>
         <input
-          type="text"
           placeholder="Search news…"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
@@ -129,62 +156,99 @@ export default function News() {
       {/* ARTICLES */}
       <div className="news-list">
         {articles.map((article, index) => (
-          <article className="news-card" key={index}>
-            <div className="news-header">
+          <LazyNewsCard
+            key={index}
+            article={article}
+            className="news-card"
+          >
+            <div className="news-overlay">
+              <div className="news-header">
+                <span className="news-source">
+                  {article.source?.name || "News"}
+                </span>
+
+                <button
+                  className={`bookmark ${
+                    isSaved(article) ? "saved" : ""
+                  }`}
+                  onClick={() => toggleSave(article)}
+                >
+                  ★
+                </button>
+              </div>
+
               <h3>{article.title}</h3>
 
-              <button
-                className={`bookmark ${isSaved(article) ? "saved" : ""}`}
-                onClick={() => toggleSave(article)}
-                title="Save article"
-              >
-                ★
-              </button>
-            </div>
+              {article.description && (
+                <p className="news-desc">{article.description}</p>
+              )}
 
-            <p className="news-source">
-              {article.source?.name}
-            </p>
+              <div className="news-actions">
+                <button
+                  className="news-link"
+                  onClick={() => setSelectedArticle(article)}
+                >
+                  Read in OPTIMA →
+                </button>
 
-            <p className="news-desc">
-              {article.description || "No description available."}
-            </p>
-
-            <a
-              href={article.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="news-link"
-            >
-              Read full article →
-            </a>
-          </article>
-        ))}
-      </div>
-
-      {/* SAVED ARTICLES */}
-      {saved.length > 0 && (
-        <>
-          <h2 className="saved-title">⭐ Saved Articles</h2>
-          <div className="news-list">
-            {saved.map((article, index) => (
-              <article className="news-card saved" key={index}>
-                <h3>{article.title}</h3>
                 <a
                   href={article.url}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="news-link"
                 >
-                  Open →
+                  Open source →
                 </a>
-              </article>
-            ))}
+              </div>
+            </div>
+          </LazyNewsCard>
+        ))}
+      </div>
+
+      {/* READING MODE */}
+      {selectedArticle && (
+        <div
+          className="modal-overlay"
+          onClick={() => setSelectedArticle(null)}
+        >
+          <div
+            className="modal-card reading-mode"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2>{selectedArticle.title}</h2>
+            <p className="muted">
+              {selectedArticle.source?.name}
+            </p>
+
+            <p className="reading-text">
+              {selectedArticle.content ||
+                selectedArticle.description ||
+                "Full content available on the source website."}
+            </p>
+
+            <div className="modal-actions">
+              <a
+                href={selectedArticle.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn btn-primary"
+              >
+                Open original
+              </a>
+
+              <button
+                className="btn btn-ghost"
+                onClick={() => setSelectedArticle(null)}
+              >
+                Close
+              </button>
+            </div>
           </div>
-        </>
+        </div>
       )}
     </div>
   );
 }
+
 
 
