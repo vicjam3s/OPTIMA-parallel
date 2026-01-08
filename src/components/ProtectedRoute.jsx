@@ -1,13 +1,15 @@
 import { Navigate, useLocation } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 export default function ProtectedRoute({ children }) {
+  const { user, loading } = useAuth();
   const location = useLocation();
 
-  // TEMP auth check (replace with Firebase later)
-  const isAuthenticated =
-    localStorage.getItem("optima_auth") === "true";
+  if (loading) {
+    return <p className="auth-loading">Checking authentication…</p>;
+  }
 
-  if (!isAuthenticated) {
+  if (!user) {
     return (
       <Navigate
         to="/login"

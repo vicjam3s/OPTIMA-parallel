@@ -5,8 +5,6 @@ export default function Landing() {
 
   return (
     <section className="landing">
-      {/* hero stays the same */}
-
       <div className="features">
         <div
           className="feature-card library"

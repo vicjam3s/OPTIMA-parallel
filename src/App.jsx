@@ -2,10 +2,12 @@ import { Routes, Route, useLocation } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Sidebar from "./components/Sidebar";
 import BackToTop from "./components/BackToTop";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 import Landing from "./pages/Landing";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
+import NotFound from "./pages/NotFound";
 
 import Notes from "./pages/Notes";
 import Focus from "./pages/Focus";
@@ -30,19 +32,23 @@ export default function App() {
         {showFeatureUI && <Sidebar />}
 
         <main className="app-main">
+          <div className="content-container">
           <Routes>
             <Route path="/" element={<Landing />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
-
-            <Route path="/notes" element={<Notes />} />
-            <Route path="/focus" element={<Focus />} />
-            <Route path="/library" element={<Library />} />
-            <Route path="/movies" element={<Movies />} />
-            <Route path="/music" element={<Music />} />
-            <Route path="/news" element={<News />} />
-            <Route path="/calendar" element={<Calendar />} />
+            <Route path="*" element={<NotFound />} />
+      
+      
+            <Route path="/notes" element={<ProtectedRoute><Notes /></ProtectedRoute>} />
+            <Route path="/focus" element={<ProtectedRoute><Focus /></ProtectedRoute>} />
+            <Route path="/library" element={<ProtectedRoute><Library /></ProtectedRoute>} />
+            <Route path="/movies" element={<ProtectedRoute><Movies /></ProtectedRoute>} />
+            <Route path="/music" element={<ProtectedRoute><Music /></ProtectedRoute>} />
+            <Route path="/news" element={<ProtectedRoute><News /></ProtectedRoute>} />
+            <Route path="/calendar" element={<ProtectedRoute><Calendar /></ProtectedRoute>} />
           </Routes>
+          </div>
         </main>
       </div>
 
