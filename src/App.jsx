@@ -3,6 +3,7 @@ import Navbar from "./components/Navbar";
 import Sidebar from "./components/Sidebar";
 import BackToTop from "./components/BackToTop";
 import ProtectedRoute from "./components/ProtectedRoute";
+import MiniPlayer from "./components/MiniPlayer";
 
 import Landing from "./pages/Landing";
 import Login from "./pages/Login";
@@ -27,6 +28,7 @@ export default function App() {
   return (
     <>
       <Navbar />
+      <MiniPlayer/>
 
       <div className={showFeatureUI ? "app-layout" : ""}>
         {showFeatureUI && <Sidebar />}

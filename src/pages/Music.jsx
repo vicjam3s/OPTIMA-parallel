@@ -1,51 +1,47 @@
 import { useEffect, useState } from "react";
+import { useMusic } from "../context/MusicContext";
 
 const FAVORITES_KEY = "optima_music_favorites";
+const CUSTOM_KEY = "optima_music_custom";
 
-/* ---------- PRESET PLAYLISTS ---------- */
-const PLAYLISTS = [
+/* ---------- DEFAULT PLAYLISTS ---------- */
+const DEFAULT_PLAYLISTS = [
   {
-    id: "lofi",
-    title: "Lofi Beats",
-    description: "Chill beats to study and relax",
+    id: "focus-lofi",
+    title: "Lofi Focus",
+    description: "Chill beats for focus sessions",
     embed:
       "https://open.spotify.com/embed/playlist/37i9dQZF1DXdxcBWuJkbcy",
+    focus: true,
   },
   {
-    id: "classical",
-    title: "Classical Focus",
-    description: "Timeless classical music for deep concentration",
-    embed:
-      "https://open.spotify.com/embed/playlist/37i9dQZF1DWWEJlAGA9gs0",
-  },
-  {
-    id: "deep",
+    id: "deep-focus",
     title: "Deep Focus",
-    description: "Minimal, instrumental focus music",
+    description: "Minimal instrumental concentration",
     embed:
       "https://open.spotify.com/embed/playlist/37i9dQZF1DWZeKCadgRdKQ",
+    focus: true,
   },
-  {
-    id: "coding",
-    title: "Coding Mode",
-    description: "Electronic & ambient for coding sessions",
-    embed:
-      "https://open.spotify.com/embed/playlist/37i9dQZF1DX8Uebhn9wzrS",
-  },
+  
 ];
 
 export default function Music() {
   const [favorites, setFavorites] = useState([]);
-  const [nowPlaying, setNowPlaying] = useState(null);
+  const [customPlaylists, setCustomPlaylists] = useState([]);
+  const [customUrl, setCustomUrl] = useState("");
 
-  /* ---------- LOAD FAVORITES ---------- */
+  const { play, nowPlaying } = useMusic();
+
+  /* ---------- LOAD STORAGE ---------- */
   useEffect(() => {
     setFavorites(
       JSON.parse(localStorage.getItem(FAVORITES_KEY)) || []
     );
+    setCustomPlaylists(
+      JSON.parse(localStorage.getItem(CUSTOM_KEY)) || []
+    );
   }, []);
 
-  /* ---------- SAVE FAVORITES ---------- */
   useEffect(() => {
     localStorage.setItem(
       FAVORITES_KEY,
@@ -53,9 +49,16 @@ export default function Music() {
     );
   }, [favorites]);
 
+  useEffect(() => {
+    localStorage.setItem(
+      CUSTOM_KEY,
+      JSON.stringify(customPlaylists)
+    );
+  }, [customPlaylists]);
+
+  /* ---------- FAVORITES ---------- */
   const toggleFavorite = (playlist) => {
     const exists = favorites.some((p) => p.id === playlist.id);
-
     setFavorites(
       exists
         ? favorites.filter((p) => p.id !== playlist.id)
@@ -66,6 +69,36 @@ export default function Music() {
   const isFavorite = (playlist) =>
     favorites.some((p) => p.id === playlist.id);
 
+  /* ---------- CUSTOM PLAYLIST ---------- */
+  const addCustomPlaylist = () => {
+    if (!customUrl.includes("spotify.com")) return;
+
+    const embedUrl = customUrl.replace(
+      "open.spotify.com",
+      "open.spotify.com/embed"
+    );
+
+    const newPlaylist = {
+      id: Date.now(),
+      title: "Custom Playlist",
+      description: "Added by you",
+      embed: embedUrl,
+    };
+
+    setCustomPlaylists([newPlaylist, ...customPlaylists]);
+    setCustomUrl("");
+  };
+
+  /* ---------- FOCUS SYNC ---------- */
+  const startFocusMusic = () => {
+    const focusPlaylist =
+      DEFAULT_PLAYLISTS.find((p) => p.focus) || null;
+
+    if (focusPlaylist) {
+      play(focusPlaylist);
+    }
+  };
+
   return (
     <div className="music-page">
       <h1>🎧 Music</h1>
@@ -73,87 +106,123 @@ export default function Music() {
         Focus-enhancing playlists powered by Spotify.
       </p>
 
-      {/* NOW PLAYING */}
+      {/* MINI PLAYER */}
       {nowPlaying && (
-        <div className="now-playing">
-          <span>▶ Now Playing</span>
+        <div className="mini-player">
+          <span>🎶 Now Playing</span>
           <strong>{nowPlaying.title}</strong>
         </div>
       )}
+
+      {/* QUICK FOCUS */}
+      <button
+        className="btn primary"
+        onClick={startFocusMusic}
+        style={{ marginBottom: "1rem" }}
+      >
+        ▶ Start Focus Music
+      </button>
+
+      {/* ADD CUSTOM */}
+      <div className="custom-playlist">
+        <input
+          placeholder="Paste Spotify playlist URL"
+          value={customUrl}
+          onChange={(e) => setCustomUrl(e.target.value)}
+        />
+        <button className="btn ghost" onClick={addCustomPlaylist}>
+          Add
+        </button>
+      </div>
 
       {/* FAVORITES */}
       {favorites.length > 0 && (
         <>
           <h2 className="section-title">⭐ Favorites</h2>
           <div className="playlist-grid">
-            {favorites.map((playlist) => (
-              <div className="playlist-card" key={playlist.id}>
-                <h3>{playlist.title}</h3>
-                <p className="muted">{playlist.description}</p>
-
-                <iframe
-                  src={playlist.embed}
-                  allow="encrypted-media"
-                  loading="lazy"
-                />
-
-                <div className="playlist-actions">
-                  <button
-                    className="btn ghost"
-                    onClick={() => setNowPlaying(playlist)}
-                  >
-                    Play
-                  </button>
-
-                  <button
-                    className="btn reset"
-                    onClick={() => toggleFavorite(playlist)}
-                  >
-                    Remove
-                  </button>
-                </div>
-              </div>
+            {favorites.map((p) => (
+              <PlaylistCard
+                key={p.id}
+                playlist={p}
+                onPlay={play}
+                onRemove={() => toggleFavorite(p)}
+              />
             ))}
           </div>
         </>
       )}
 
-      {/* PLAYLISTS */}
+      {/* DEFAULT */}
       <h2 className="section-title">🎶 Focus Playlists</h2>
-
       <div className="playlist-grid">
-        {PLAYLISTS.map((playlist) => (
-          <div className="playlist-card" key={playlist.id}>
-            <h3>{playlist.title}</h3>
-            <p className="muted">{playlist.description}</p>
-
-            <iframe
-              src={playlist.embed}
-              allow="encrypted-media"
-              loading="lazy"
-            />
-
-            <div className="playlist-actions">
-              <button
-                className="btn primary"
-                onClick={() => setNowPlaying(playlist)}
-              >
-                Play
-              </button>
-
-              <button
-                className={`btn ghost ${
-                  isFavorite(playlist) ? "saved" : ""
-                }`}
-                onClick={() => toggleFavorite(playlist)}
-              >
-                {isFavorite(playlist) ? "★ Saved" : "☆ Save"}
-              </button>
-            </div>
-          </div>
+        {DEFAULT_PLAYLISTS.map((p) => (
+          <PlaylistCard
+            key={p.id}
+            playlist={p}
+            onPlay={play}
+            onSave={() => toggleFavorite(p)}
+            saved={isFavorite(p)}
+          />
         ))}
+      </div>
+
+      {/* CUSTOM */}
+      {customPlaylists.length > 0 && (
+        <>
+          <h2 className="section-title">➕ Your Playlists</h2>
+          <div className="playlist-grid">
+            {customPlaylists.map((p) => (
+              <PlaylistCard
+                key={p.id}
+                playlist={p}
+                onPlay={play}
+                onSave={() => toggleFavorite(p)}
+                saved={isFavorite(p)}
+              />
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
+/* ---------- CARD ---------- */
+
+function PlaylistCard({ playlist, onPlay, onSave, onRemove, saved }) {
+  return (
+    <div className="playlist-card">
+      <h3>{playlist.title}</h3>
+      <p className="muted">{playlist.description}</p>
+
+      <iframe
+        src={playlist.embed}
+        allow="encrypted-media"
+        loading="lazy"
+      />
+
+      <div className="playlist-actions">
+        <button
+          className="btn primary"
+          onClick={() => onPlay(playlist)}
+        >
+          Play
+        </button>
+
+        {onSave && (
+          <button className="btn ghost" onClick={onSave}>
+            {saved ? "★ Saved" : "☆ Save"}
+          </button>
+        )}
+
+        {onRemove && (
+          <button className="btn reset" onClick={onRemove}>
+            Remove
+          </button>
+        )}
       </div>
     </div>
   );
 }
+
 
