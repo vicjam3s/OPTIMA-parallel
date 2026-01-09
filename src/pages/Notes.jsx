@@ -7,23 +7,60 @@ export default function Notes() {
   const [activeId, setActiveId] = useState(null);
   const [search, setSearch] = useState("");
   const [lastSaved, setLastSaved] = useState("");
+  const [hydrated, setHydrated] = useState(false);
 
-  /* ---------- LOAD NOTES ---------- */
+  /* ---------- HYDRATE NOTES ---------- */
   useEffect(() => {
-    const stored = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-    setNotes(stored);
-    if (stored.length > 0) setActiveId(stored[0].id);
+    const stored = localStorage.getItem(STORAGE_KEY);
+
+    if (!stored) {
+      setHydrated(true);
+      return;
+    }
+
+    try {
+      const parsed = JSON.parse(stored);
+
+      if (Array.isArray(parsed)) {
+        setNotes(parsed);
+        if (parsed.length > 0) setActiveId(parsed[0].id);
+      }
+    } catch {
+      // Legacy plain-text recovery
+      const migrated = [
+        {
+          id: Date.now(),
+          title: "Recovered note",
+          content: stored,
+          pinned: false,
+          updatedAt: Date.now(),
+        },
+      ];
+
+      setNotes(migrated);
+      setActiveId(migrated[0].id);
+
+      localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify(migrated)
+      );
+    } finally {
+      setHydrated(true);
+    }
   }, []);
 
-  /* ---------- SAVE NOTES ---------- */
+  /* ---------- SAVE NOTES (AFTER HYDRATION) ---------- */
   useEffect(() => {
+    if (!hydrated) return;
+
     localStorage.setItem(STORAGE_KEY, JSON.stringify(notes));
+
     if (notes.length > 0) {
       setLastSaved("Saved just now");
       const t = setTimeout(() => setLastSaved(""), 1500);
       return () => clearTimeout(t);
     }
-  }, [notes]);
+  }, [notes, hydrated]);
 
   /* ---------- CREATE ---------- */
   const createNote = () => {
@@ -35,7 +72,7 @@ export default function Notes() {
       updatedAt: Date.now(),
     };
 
-    setNotes([newNote, ...notes]);
+    setNotes((prev) => [newNote, ...prev]);
     setActiveId(newNote.id);
   };
 
@@ -45,6 +82,7 @@ export default function Notes() {
 
     const updated = notes.filter((n) => n.id !== id);
     setNotes(updated);
+
     if (id === activeId && updated.length > 0) {
       setActiveId(updated[0].id);
     }

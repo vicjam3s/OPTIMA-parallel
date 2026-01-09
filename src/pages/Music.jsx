@@ -22,39 +22,47 @@ const DEFAULT_PLAYLISTS = [
       "https://open.spotify.com/embed/playlist/37i9dQZF1DWZeKCadgRdKQ",
     focus: true,
   },
-  
 ];
 
 export default function Music() {
   const [favorites, setFavorites] = useState([]);
   const [customPlaylists, setCustomPlaylists] = useState([]);
   const [customUrl, setCustomUrl] = useState("");
+  const [hydrated, setHydrated] = useState(false);
 
   const { play, nowPlaying } = useMusic();
 
-  /* ---------- LOAD STORAGE ---------- */
+  /* ---------- HYDRATE FROM STORAGE ---------- */
   useEffect(() => {
-    setFavorites(
-      JSON.parse(localStorage.getItem(FAVORITES_KEY)) || []
-    );
-    setCustomPlaylists(
-      JSON.parse(localStorage.getItem(CUSTOM_KEY)) || []
-    );
+    try {
+      const favs = JSON.parse(localStorage.getItem(FAVORITES_KEY));
+      if (Array.isArray(favs)) setFavorites(favs);
+
+      const customs = JSON.parse(localStorage.getItem(CUSTOM_KEY));
+      if (Array.isArray(customs)) setCustomPlaylists(customs);
+    } catch {
+      console.warn("Music storage corrupted");
+    } finally {
+      setHydrated(true);
+    }
   }, []);
 
+  /* ---------- SAVE (ONLY AFTER HYDRATION) ---------- */
   useEffect(() => {
+    if (!hydrated) return;
     localStorage.setItem(
       FAVORITES_KEY,
       JSON.stringify(favorites)
     );
-  }, [favorites]);
+  }, [favorites, hydrated]);
 
   useEffect(() => {
+    if (!hydrated) return;
     localStorage.setItem(
       CUSTOM_KEY,
       JSON.stringify(customPlaylists)
     );
-  }, [customPlaylists]);
+  }, [customPlaylists, hydrated]);
 
   /* ---------- FAVORITES ---------- */
   const toggleFavorite = (playlist) => {
@@ -85,7 +93,7 @@ export default function Music() {
       embed: embedUrl,
     };
 
-    setCustomPlaylists([newPlaylist, ...customPlaylists]);
+    setCustomPlaylists((prev) => [newPlaylist, ...prev]);
     setCustomUrl("");
   };
 
@@ -94,9 +102,7 @@ export default function Music() {
     const focusPlaylist =
       DEFAULT_PLAYLISTS.find((p) => p.focus) || null;
 
-    if (focusPlaylist) {
-      play(focusPlaylist);
-    }
+    if (focusPlaylist) play(focusPlaylist);
   };
 
   return (
@@ -106,7 +112,6 @@ export default function Music() {
         Focus-enhancing playlists powered by Spotify.
       </p>
 
-      {/* MINI PLAYER */}
       {nowPlaying && (
         <div className="mini-player">
           <span>🎶 Now Playing</span>
@@ -114,7 +119,6 @@ export default function Music() {
         </div>
       )}
 
-      {/* QUICK FOCUS */}
       <button
         className="btn primary"
         onClick={startFocusMusic}
@@ -123,7 +127,6 @@ export default function Music() {
         ▶ Start Focus Music
       </button>
 
-      {/* ADD CUSTOM */}
       <div className="custom-playlist">
         <input
           placeholder="Paste Spotify playlist URL"
@@ -135,7 +138,6 @@ export default function Music() {
         </button>
       </div>
 
-      {/* FAVORITES */}
       {favorites.length > 0 && (
         <>
           <h2 className="section-title">⭐ Favorites</h2>
@@ -152,7 +154,6 @@ export default function Music() {
         </>
       )}
 
-      {/* DEFAULT */}
       <h2 className="section-title">🎶 Focus Playlists</h2>
       <div className="playlist-grid">
         {DEFAULT_PLAYLISTS.map((p) => (
@@ -166,7 +167,6 @@ export default function Music() {
         ))}
       </div>
 
-      {/* CUSTOM */}
       {customPlaylists.length > 0 && (
         <>
           <h2 className="section-title">➕ Your Playlists</h2>
@@ -195,11 +195,7 @@ function PlaylistCard({ playlist, onPlay, onSave, onRemove, saved }) {
       <h3>{playlist.title}</h3>
       <p className="muted">{playlist.description}</p>
 
-      <iframe
-        src={playlist.embed}
-        allow="encrypted-media"
-        loading="lazy"
-      />
+      <iframe src={playlist.embed} allow="encrypted-media" />
 
       <div className="playlist-actions">
         <button
@@ -224,5 +220,8 @@ function PlaylistCard({ playlist, onPlay, onSave, onRemove, saved }) {
     </div>
   );
 }
+
+
+
 
 
