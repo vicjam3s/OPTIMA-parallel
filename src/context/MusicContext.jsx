@@ -11,15 +11,29 @@ export function MusicProvider({ children }) {
     setPlaying(true);
   };
 
-  const pause = () => setPlaying(false);
-  const stop = () => {
-    setNowPlaying(null);
+  const pause = () => {
     setPlaying(false);
+  };
+
+  const resume = () => {
+    if (nowPlaying) setPlaying(true);
+  };
+
+  const stop = () => {
+    setPlaying(false);
+    setNowPlaying(null);
   };
 
   return (
     <MusicContext.Provider
-      value={{ nowPlaying, playing, play, pause, stop }}
+      value={{
+        nowPlaying,
+        playing,
+        play,
+        pause,
+        resume,
+        stop,
+      }}
     >
       {children}
     </MusicContext.Provider>
@@ -27,3 +41,4 @@ export function MusicProvider({ children }) {
 }
 
 export const useMusic = () => useContext(MusicContext);
+

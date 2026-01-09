@@ -1,66 +1,26 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
+import usePersistentState from "../hooks/usePersistentState";
 
 const STORAGE_KEY = "optima_notes";
 
 export default function Notes() {
-  const [notes, setNotes] = useState([]);
-  const [activeId, setActiveId] = useState(null);
+  const [notes, setNotes] = usePersistentState(
+    STORAGE_KEY,
+    [],
+    (legacy) => [
+      {
+        id: Date.now(),
+        title: "Recovered note",
+        content: legacy,
+        pinned: false,
+        updatedAt: Date.now(),
+      },
+    ]
+  );
+
+  const [activeId, setActiveId] = useState(notes[0]?.id || null);
   const [search, setSearch] = useState("");
   const [lastSaved, setLastSaved] = useState("");
-  const [hydrated, setHydrated] = useState(false);
-
-  /* ---------- HYDRATE NOTES ---------- */
-  useEffect(() => {
-    const stored = localStorage.getItem(STORAGE_KEY);
-
-    if (!stored) {
-      setHydrated(true);
-      return;
-    }
-
-    try {
-      const parsed = JSON.parse(stored);
-
-      if (Array.isArray(parsed)) {
-        setNotes(parsed);
-        if (parsed.length > 0) setActiveId(parsed[0].id);
-      }
-    } catch {
-      // Legacy plain-text recovery
-      const migrated = [
-        {
-          id: Date.now(),
-          title: "Recovered note",
-          content: stored,
-          pinned: false,
-          updatedAt: Date.now(),
-        },
-      ];
-
-      setNotes(migrated);
-      setActiveId(migrated[0].id);
-
-      localStorage.setItem(
-        STORAGE_KEY,
-        JSON.stringify(migrated)
-      );
-    } finally {
-      setHydrated(true);
-    }
-  }, []);
-
-  /* ---------- SAVE NOTES (AFTER HYDRATION) ---------- */
-  useEffect(() => {
-    if (!hydrated) return;
-
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(notes));
-
-    if (notes.length > 0) {
-      setLastSaved("Saved just now");
-      const t = setTimeout(() => setLastSaved(""), 1500);
-      return () => clearTimeout(t);
-    }
-  }, [notes, hydrated]);
 
   /* ---------- CREATE ---------- */
   const createNote = () => {
@@ -74,18 +34,15 @@ export default function Notes() {
 
     setNotes((prev) => [newNote, ...prev]);
     setActiveId(newNote.id);
+    setLastSaved("Saved just now");
   };
 
   /* ---------- DELETE ---------- */
   const deleteNote = (id) => {
     if (!window.confirm("Delete this note?")) return;
 
-    const updated = notes.filter((n) => n.id !== id);
-    setNotes(updated);
-
-    if (id === activeId && updated.length > 0) {
-      setActiveId(updated[0].id);
-    }
+    setNotes((prev) => prev.filter((n) => n.id !== id));
+    if (id === activeId) setActiveId(null);
   };
 
   /* ---------- UPDATE ---------- */
@@ -97,28 +54,7 @@ export default function Notes() {
           : n
       )
     );
-  };
-
-  /* ---------- PIN ---------- */
-  const togglePin = (id) => {
-    setNotes((prev) =>
-      prev.map((n) =>
-        n.id === id ? { ...n, pinned: !n.pinned } : n
-      )
-    );
-  };
-
-  /* ---------- EXPORT ---------- */
-  const exportNote = (note) => {
-    const blob = new Blob(
-      [`${note.title}\n\n${note.content}`],
-      { type: "text/plain" }
-    );
-
-    const link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    link.download = `${note.title || "note"}.txt`;
-    link.click();
+    setLastSaved("Saved just now");
   };
 
   const activeNote = notes.find((n) => n.id === activeId);
@@ -141,10 +77,8 @@ export default function Notes() {
   return (
     <div className="notes-page">
       <h1>📝 Notes</h1>
-      <p className="muted">Your thoughts, organized.</p>
 
       <div className="notes-layout">
-        {/* SIDEBAR */}
         <aside className="notes-sidebar">
           <button className="btn primary full" onClick={createNote}>
             + New Note
@@ -164,35 +98,12 @@ export default function Notes() {
                 className={note.id === activeId ? "active" : ""}
                 onClick={() => setActiveId(note.id)}
               >
-                <span>{note.title}</span>
-
-                <div className="note-actions">
-                  <button
-                    title="Pin"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      togglePin(note.id);
-                    }}
-                  >
-                    {note.pinned ? "📌" : "📍"}
-                  </button>
-
-                  <button
-                    title="Delete"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      deleteNote(note.id);
-                    }}
-                  >
-                    🗑
-                  </button>
-                </div>
+                {note.title}
               </li>
             ))}
           </ul>
         </aside>
 
-        {/* EDITOR */}
         <main className="notes-editor">
           {activeNote ? (
             <>
@@ -206,28 +117,13 @@ export default function Notes() {
 
               <textarea
                 className="notes-input"
-                placeholder="Start writing…"
                 value={activeNote.content}
                 onChange={(e) =>
                   updateNote({ content: e.target.value })
                 }
               />
 
-              <div className="notes-footer">
-                <span className="muted">
-                  {lastSaved ||
-                    `Last edited ${new Date(
-                      activeNote.updatedAt
-                    ).toLocaleTimeString()}`}
-                </span>
-
-                <button
-                  className="btn ghost"
-                  onClick={() => exportNote(activeNote)}
-                >
-                  Export
-                </button>
-              </div>
+              <span className="muted">{lastSaved}</span>
             </>
           ) : (
             <p className="muted">Create or select a note.</p>
@@ -237,5 +133,6 @@ export default function Notes() {
     </div>
   );
 }
+
 
 

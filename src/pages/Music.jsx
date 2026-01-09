@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useMusic } from "../context/MusicContext";
+import usePersistentState from "../hooks/usePersistentState";
 
 const FAVORITES_KEY = "optima_music_favorites";
 const CUSTOM_KEY = "optima_music_custom";
@@ -25,44 +26,16 @@ const DEFAULT_PLAYLISTS = [
 ];
 
 export default function Music() {
-  const [favorites, setFavorites] = useState([]);
-  const [customPlaylists, setCustomPlaylists] = useState([]);
+  const { nowPlaying } = useMusic();
+
+  const [favorites, setFavorites] = usePersistentState(
+    FAVORITES_KEY,
+    []
+  );
+  const [customPlaylists, setCustomPlaylists] =
+    usePersistentState(CUSTOM_KEY, []);
+
   const [customUrl, setCustomUrl] = useState("");
-  const [hydrated, setHydrated] = useState(false);
-
-  const { play, nowPlaying } = useMusic();
-
-  /* ---------- HYDRATE FROM STORAGE ---------- */
-  useEffect(() => {
-    try {
-      const favs = JSON.parse(localStorage.getItem(FAVORITES_KEY));
-      if (Array.isArray(favs)) setFavorites(favs);
-
-      const customs = JSON.parse(localStorage.getItem(CUSTOM_KEY));
-      if (Array.isArray(customs)) setCustomPlaylists(customs);
-    } catch {
-      console.warn("Music storage corrupted");
-    } finally {
-      setHydrated(true);
-    }
-  }, []);
-
-  /* ---------- SAVE (ONLY AFTER HYDRATION) ---------- */
-  useEffect(() => {
-    if (!hydrated) return;
-    localStorage.setItem(
-      FAVORITES_KEY,
-      JSON.stringify(favorites)
-    );
-  }, [favorites, hydrated]);
-
-  useEffect(() => {
-    if (!hydrated) return;
-    localStorage.setItem(
-      CUSTOM_KEY,
-      JSON.stringify(customPlaylists)
-    );
-  }, [customPlaylists, hydrated]);
 
   /* ---------- FAVORITES ---------- */
   const toggleFavorite = (playlist) => {
@@ -78,31 +51,44 @@ export default function Music() {
     favorites.some((p) => p.id === playlist.id);
 
   /* ---------- CUSTOM PLAYLIST ---------- */
-  const addCustomPlaylist = () => {
-    if (!customUrl.includes("spotify.com")) return;
+  const addCustomPlaylist = async () => {
+  if (!customUrl.includes("spotify.com")) return;
 
-    const embedUrl = customUrl.replace(
-      "open.spotify.com",
-      "open.spotify.com/embed"
+  const embedUrl = customUrl.replace(
+    "open.spotify.com",
+    "open.spotify.com/embed"
+  );
+
+  let title = "Custom Playlist";
+
+  try {
+    const res = await fetch(
+      `https://open.spotify.com/oembed?url=${encodeURIComponent(
+        customUrl
+      )}`
     );
+    const data = await res.json();
+    if (data?.title) title = data.title;
+  } catch {
+    console.warn("Failed to fetch playlist title");
+  }
 
-    const newPlaylist = {
-      id: Date.now(),
-      title: "Custom Playlist",
-      description: "Added by you",
-      embed: embedUrl,
-    };
-
-    setCustomPlaylists((prev) => [newPlaylist, ...prev]);
-    setCustomUrl("");
+  const newPlaylist = {
+    id: Date.now(),
+    title,
+    description: "Added by you",
+    embed: embedUrl,
   };
 
-  /* ---------- FOCUS SYNC ---------- */
-  const startFocusMusic = () => {
-    const focusPlaylist =
-      DEFAULT_PLAYLISTS.find((p) => p.focus) || null;
+  setCustomPlaylists((prev) => [newPlaylist, ...prev]);
+  setCustomUrl("");
+};
 
-    if (focusPlaylist) play(focusPlaylist);
+
+  const removeCustomPlaylist = (id) => {
+    setCustomPlaylists((prev) =>
+      prev.filter((p) => p.id !== id)
+    );
   };
 
   return (
@@ -112,6 +98,7 @@ export default function Music() {
         Focus-enhancing playlists powered by Spotify.
       </p>
 
+      {/* MINI PLAYER INDICATOR */}
       {nowPlaying && (
         <div className="mini-player">
           <span>🎶 Now Playing</span>
@@ -119,14 +106,7 @@ export default function Music() {
         </div>
       )}
 
-      <button
-        className="btn primary"
-        onClick={startFocusMusic}
-        style={{ marginBottom: "1rem" }}
-      >
-        ▶ Start Focus Music
-      </button>
-
+      {/* ADD CUSTOM */}
       <div className="custom-playlist">
         <input
           placeholder="Paste Spotify playlist URL"
@@ -138,6 +118,7 @@ export default function Music() {
         </button>
       </div>
 
+      {/* FAVORITES */}
       {favorites.length > 0 && (
         <>
           <h2 className="section-title">⭐ Favorites</h2>
@@ -146,7 +127,6 @@ export default function Music() {
               <PlaylistCard
                 key={p.id}
                 playlist={p}
-                onPlay={play}
                 onRemove={() => toggleFavorite(p)}
               />
             ))}
@@ -154,19 +134,20 @@ export default function Music() {
         </>
       )}
 
+      {/* DEFAULT */}
       <h2 className="section-title">🎶 Focus Playlists</h2>
       <div className="playlist-grid">
         {DEFAULT_PLAYLISTS.map((p) => (
           <PlaylistCard
             key={p.id}
             playlist={p}
-            onPlay={play}
             onSave={() => toggleFavorite(p)}
             saved={isFavorite(p)}
           />
         ))}
       </div>
 
+      {/* CUSTOM */}
       {customPlaylists.length > 0 && (
         <>
           <h2 className="section-title">➕ Your Playlists</h2>
@@ -175,8 +156,8 @@ export default function Music() {
               <PlaylistCard
                 key={p.id}
                 playlist={p}
-                onPlay={play}
                 onSave={() => toggleFavorite(p)}
+                onRemove={() => removeCustomPlaylist(p.id)}
                 saved={isFavorite(p)}
               />
             ))}
@@ -189,20 +170,28 @@ export default function Music() {
 
 /* ---------- CARD ---------- */
 
-function PlaylistCard({ playlist, onPlay, onSave, onRemove, saved }) {
+function PlaylistCard({ playlist, onSave, onRemove, saved }) {
+  const { play, nowPlaying, playing } = useMusic();
+
+  const isCurrent = nowPlaying?.id === playlist.id;
+
   return (
     <div className="playlist-card">
       <h3>{playlist.title}</h3>
       <p className="muted">{playlist.description}</p>
 
-      <iframe src={playlist.embed} allow="encrypted-media" />
+      <iframe
+        src={playlist.embed}
+        allow="encrypted-media"
+        loading="lazy"
+      />
 
       <div className="playlist-actions">
         <button
           className="btn primary"
-          onClick={() => onPlay(playlist)}
+          onClick={() => play(playlist)}
         >
-          Play
+          {isCurrent && playing ? "Playing" : "Play"}
         </button>
 
         {onSave && (
@@ -220,8 +209,3 @@ function PlaylistCard({ playlist, onPlay, onSave, onRemove, saved }) {
     </div>
   );
 }
-
-
-
-
-
