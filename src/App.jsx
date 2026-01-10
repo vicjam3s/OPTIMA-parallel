@@ -17,6 +17,7 @@ import Movies from "./pages/Movies";
 import Music from "./pages/Music";
 import News from "./pages/News";
 import Calendar from "./pages/Calendar";
+import Settings from "./pages/Settings";
 
 export default function App() {
   const location = useLocation();
@@ -41,7 +42,7 @@ export default function App() {
             <Route path="/signup" element={<Signup />} />
             <Route path="*" element={<NotFound />} />
       
-      
+            <Route path="/settings" element= {<ProtectedRoute><Settings /></ProtectedRoute>} />
             <Route path="/notes" element={<ProtectedRoute><Notes /></ProtectedRoute>} />
             <Route path="/focus" element={<ProtectedRoute><Focus /></ProtectedRoute>} />
             <Route path="/library" element={<ProtectedRoute><Library /></ProtectedRoute>} />

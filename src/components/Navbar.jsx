@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useEffect, useState } from "react";
+import { NavLink} from "react-router-dom";
 
 export default function Navbar() {
   const { user, logout } = useAuth();
@@ -47,6 +48,12 @@ export default function Navbar() {
 
           {/* DESKTOP ACTIONS */}
           <nav className="navbar-actions desktop-only">
+            {user && (
+             <NavLink to="/Settings" className="nav-item" title="Settings">
+               ⚙️
+             </NavLink>
+            )}
+
             
             {user ? (
               <button className="btn btn-ghost" onClick={handleLogout}>

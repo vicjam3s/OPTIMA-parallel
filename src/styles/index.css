@@ -500,6 +500,30 @@ span{
 }
 
 
+/* ================SETTINGS PAGE====================*/
+.settings-page {
+  max-width: 800px;
+}
+
+.settings-section {
+  margin-top: 2rem;
+  padding: 1.25rem;
+  border-radius: 14px;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-surface);
+}
+
+.settings-section h2 {
+  margin-bottom: 0.75rem;
+}
+
+details summary {
+  cursor: pointer;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+
 /* ================= SIDEBAR BASE ================= */
 
 .sidebar {
@@ -1854,4 +1878,19 @@ textarea:focus {
   to {
     transform: rotate(360deg);
   }
+}
+
+/* ================= LIGHT THEME ================= */
+[data-theme="light"] {
+  --bg-main: #f8fafc;
+  --bg-surface: #ffffff;
+  --border-subtle: #e2e8f0;
+
+  --text-main: #020617;
+  --text-muted: #475569;
+
+  --accent: #6366f1;        /* same indigo, slightly toned */
+  --accent-soft: #818cf8;
+
+  --card-bg: #ffffff;
 }
