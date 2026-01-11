@@ -1,0 +1,164 @@
+/* ---------- MAIN CONTENT ---------- */
+
+.dashboard-main {
+  flex: 1;
+  padding: 2.5rem;
+}
+
+.dashboard-main h1 {
+  font-size: 2.2rem;
+  color: #818cf8;
+}
+
+
+/* ---------- LANDING ---------- */
+.landing {
+  padding: 4rem 2rem;
+  min-height: calc(100vh - 64px);
+}
+
+.hero {
+  max-width: 720px;
+  margin: 2rem auto;
+  text-align: center;
+}
+
+.hero h1 {
+  font-size: 4rem;
+  letter-spacing: 2px;
+}
+
+.hero p {
+  margin-top: 1.5rem;
+  font-size: 1.1rem;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+
+.hero-actions {
+  margin-top: 2.5rem;
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+}
+
+/* ---------- FEATURES GRID ---------- */
+.features {
+  margin-top: 2rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  gap: 1.25rem;
+  max-width: 900px;
+  
+}
+
+.feature-card {
+  position: relative;
+  height: 140px;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  display: flex;
+  align-items: flex-end;
+  padding: 1.25rem;
+  font-weight: 600;
+  font-size: 1.05rem;
+  position: relative;
+  cursor: pointer;
+  color: white;
+  background-size: cover;
+  background-position: center;
+  border: 1px solid var(--border-subtle);
+  transition: transform 0.25s ease, border-color 0.25s ease;
+}
+
+.feature-card:hover {
+  transform: translateY(-6px);
+  border-color: var(--accent);
+}
+/* dark overlay for readability */
+.feature-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    rgba(2, 6, 23, 0.85),
+    rgba(2, 6, 23, 0.3)
+  );
+}
+
+.feature-card:active {
+  transform: translateY(-2px) scale(0.98);
+}
+
+.feature-card span {
+  position: relative;
+  z-index: 1;
+}
+span{
+  font-size: larger;
+}
+
+/* ================= TILE BACKGROUNDS ================= */
+
+.feature-card.library {
+  background-image: url("https://images.unsplash.com/photo-1524995997946-a1c2e315a42f");
+}
+
+.feature-card.music {
+  background-image: url("https://images.unsplash.com/photo-1511379938547-c1f69419868d");
+}
+
+.feature-card.focus {
+  background-image: url("https://images.unsplash.com/photo-1506784365847-bbad939e9335");
+}
+
+.feature-card.movies {
+  background-image: url("https://images.unsplash.com/photo-1489599849927-2ee91cede3ba");
+}
+
+.feature-card.calendar {
+  background-image: url("https://images.unsplash.com/photo-1506784983877-45594efa4cbe");
+}
+
+.feature-card.news {
+  background-image: url("https://images.unsplash.com/photo-1504711434969-e33886168f5c");
+}
+
+.feature-card.notes {
+  background-image: url("https://images.unsplash.com/photo-1515378791036-0648a3ef77b2");
+}
+
+/* ================= LANDING INTRO ANIMATION ================= */
+
+.landing {
+  animation: fadeIn 0.6s ease;
+}
+
+.features {
+  animation: staggerIn 0.8s ease;
+}
+
+/* keyframes */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes staggerIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

@@ -473,6 +473,8 @@ span{
   display: flex;
   align-items: center;
   justify-content: center;
+  
+  
 }
 
 .auth-card {
@@ -593,7 +595,7 @@ details summary {
 .app-main {
   margin-left: 80px;
   padding: 2rem;
-  max-width: 1200px;
+  max-width: 1000px;
 }
 
 /* ================= MOBILE BOTTOM NAV ================= */

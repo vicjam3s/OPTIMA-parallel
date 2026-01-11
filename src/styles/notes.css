@@ -1,0 +1,102 @@
+/* ================= NOTES FEATURE ================= */
+
+.notes-page {
+  max-width: 900px;
+}
+
+.notes-input {
+  margin-top: 1.5rem;
+  width: 100%;
+  min-height: 300px;
+  padding: 1.25rem;
+  font-size: 1rem;
+  line-height: 1.6;
+  border-radius: 12px;
+  border: 1px solid #1e293b;
+  background: #020617;
+  color: #e5e7eb;
+  resize: vertical;
+  box-shadow: inset 0 0 0 1px rgba(129, 140, 248, 0.05);
+  font-family: candara;
+}
+
+.notes-input::placeholder {
+  color: #64748b;
+}
+
+.notes-input:focus {
+  outline: none;
+  border-color: #818cf8;
+}
+/* ================= NOTES LAYOUT ================= */
+
+.notes-layout {
+  display: flex;
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.notes-sidebar {
+  width: 260px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  font-weight: 600;
+}
+
+.notes-search {
+  padding: 0.45rem 0.65rem;
+  border-radius: 8px;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-surface);
+  color: var(--text-main);
+  font-size: 0.85rem;
+}
+
+.notes-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.notes-list li {
+  padding: 0.6rem;
+  border-radius: 8px;
+  border: 1px solid var(--border-subtle);
+  cursor: pointer;
+  margin-bottom: 0.4rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.notes-list li.active {
+  border-color: var(--accent);
+}
+
+.note-actions button {
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.notes-editor {
+  flex: 1;
+}
+
+.notes-title {
+  width: 100%;
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  background: transparent;
+  border: none;
+  color: var(--text-main);
+}
+
+.notes-footer {
+  margin-top: 0.75rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}

@@ -1,0 +1,22 @@
+/* ================SETTINGS PAGE====================*/
+.settings-page {
+  max-width: 800px;
+}
+
+.settings-section {
+  margin-top: 2rem;
+  padding: 1.25rem;
+  border-radius: 14px;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-surface);
+}
+
+.settings-section h2 {
+  margin-bottom: 0.75rem;
+}
+
+details summary {
+  cursor: pointer;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}

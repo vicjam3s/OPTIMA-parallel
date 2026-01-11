@@ -1,47 +1,34 @@
 import { useEffect, useRef, useState } from "react";
 
-/**
- * usePersistentState
- * @param {string} key - localStorage key
- * @param {*} initialValue - fallback value
- * @param {Function} migrate - optional legacy migration fn
- */
-export default function usePersistentState(
-  key,
-  initialValue,
-  migrate
-) {
+export default function usePersistentState(key, initialValue) {
   const [state, setState] = useState(initialValue);
   const hydrated = useRef(false);
 
-  // HYDRATE
+  // 🔹 LOAD ONCE (hydration guard)
   useEffect(() => {
-    const stored = localStorage.getItem(key);
-
-    if (!stored) {
-      hydrated.current = true;
-      return;
-    }
-
     try {
-      const parsed = JSON.parse(stored);
-      setState(parsed);
-    } catch {
-      if (migrate) {
-        const migrated = migrate(stored);
-        setState(migrated);
-        localStorage.setItem(key, JSON.stringify(migrated));
+      const stored = localStorage.getItem(key);
+      if (stored !== null) {
+        setState(JSON.parse(stored));
       }
+    } catch (err) {
+      console.error("Failed to load from localStorage", err);
     } finally {
       hydrated.current = true;
     }
-  }, [key, migrate]);
+  }, [key]);
 
-  // SAVE (AFTER HYDRATION)
+  // 🔹 SAVE ONLY AFTER HYDRATION
   useEffect(() => {
     if (!hydrated.current) return;
-    localStorage.setItem(key, JSON.stringify(state));
+
+    try {
+      localStorage.setItem(key, JSON.stringify(state));
+    } catch (err) {
+      console.error("Failed to save to localStorage", err);
+    }
   }, [key, state]);
 
   return [state, setState];
 }
+

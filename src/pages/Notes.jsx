@@ -1,26 +1,53 @@
-import { useMemo, useState } from "react";
-import usePersistentState from "../hooks/usePersistentState";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 const STORAGE_KEY = "optima_notes";
+const SAVE_DELAY = 500; // ms debounce
 
 export default function Notes() {
-  const [notes, setNotes] = usePersistentState(
-    STORAGE_KEY,
-    [],
-    (legacy) => [
-      {
-        id: Date.now(),
-        title: "Recovered note",
-        content: legacy,
-        pinned: false,
-        updatedAt: Date.now(),
-      },
-    ]
-  );
-
-  const [activeId, setActiveId] = useState(notes[0]?.id || null);
+  const [notes, setNotes] = useState([]);
+  const [activeId, setActiveId] = useState(null);
   const [search, setSearch] = useState("");
   const [lastSaved, setLastSaved] = useState("");
+
+  const hydrated = useRef(false);
+  const saveTimeout = useRef(null);
+
+  /* ---------- LOAD (HYDRATION GUARD) ---------- */
+  useEffect(() => {
+    try {
+      const stored = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+      setNotes(stored);
+      if (stored.length > 0) setActiveId(stored[0].id);
+      hydrated.current = true;
+    } catch {
+      setNotes([]);
+      hydrated.current = true;
+    }
+  }, []);
+
+  /* ---------- DEBOUNCED AUTOSAVE ---------- */
+  useEffect(() => {
+    if (!hydrated.current) return;
+
+    if (saveTimeout.current) {
+      clearTimeout(saveTimeout.current);
+    }
+
+    saveTimeout.current = setTimeout(() => {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(notes));
+      setLastSaved("Saved");
+      setTimeout(() => setLastSaved(""), 1200);
+    }, SAVE_DELAY);
+
+    return () => clearTimeout(saveTimeout.current);
+  }, [notes]);
+
+  /* ---------- FORCE SAVE ON UNMOUNT ---------- */
+  useEffect(() => {
+    return () => {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(notes));
+    };
+  }, [notes]);
 
   /* ---------- CREATE ---------- */
   const createNote = () => {
@@ -31,16 +58,13 @@ export default function Notes() {
       pinned: false,
       updatedAt: Date.now(),
     };
-
     setNotes((prev) => [newNote, ...prev]);
     setActiveId(newNote.id);
-    setLastSaved("Saved just now");
   };
 
   /* ---------- DELETE ---------- */
   const deleteNote = (id) => {
     if (!window.confirm("Delete this note?")) return;
-
     setNotes((prev) => prev.filter((n) => n.id !== id));
     if (id === activeId) setActiveId(null);
   };
@@ -54,7 +78,15 @@ export default function Notes() {
           : n
       )
     );
-    setLastSaved("Saved just now");
+  };
+
+  /* ---------- PIN ---------- */
+  const togglePin = (id) => {
+    setNotes((prev) =>
+      prev.map((n) =>
+        n.id === id ? { ...n, pinned: !n.pinned } : n
+      )
+    );
   };
 
   const activeNote = notes.find((n) => n.id === activeId);
@@ -77,8 +109,10 @@ export default function Notes() {
   return (
     <div className="notes-page">
       <h1>📝 Notes</h1>
+      <p className="muted">Autosaved as you type.</p>
 
       <div className="notes-layout">
+        {/* SIDEBAR */}
         <aside className="notes-sidebar">
           <button className="btn primary full" onClick={createNote}>
             + New Note
@@ -98,12 +132,27 @@ export default function Notes() {
                 className={note.id === activeId ? "active" : ""}
                 onClick={() => setActiveId(note.id)}
               >
-                {note.title}
+                <span>{note.title}</span>
+                <div className="note-actions">
+                  <button onClick={(e) => {
+                    e.stopPropagation();
+                    togglePin(note.id);
+                  }}>
+                    {note.pinned ? "📌" : "📍"}
+                  </button>
+                  <button onClick={(e) => {
+                    e.stopPropagation();
+                    deleteNote(note.id);
+                  }}>
+                    🗑
+                  </button>
+                </div>
               </li>
             ))}
           </ul>
         </aside>
 
+        {/* EDITOR */}
         <main className="notes-editor">
           {activeNote ? (
             <>
@@ -117,13 +166,21 @@ export default function Notes() {
 
               <textarea
                 className="notes-input"
+                placeholder="Start writing…"
                 value={activeNote.content}
                 onChange={(e) =>
                   updateNote({ content: e.target.value })
                 }
               />
 
-              <span className="muted">{lastSaved}</span>
+              <div className="notes-footer">
+                <span className="muted">
+                  {lastSaved ||
+                    `Last edited ${new Date(
+                      activeNote.updatedAt
+                    ).toLocaleTimeString()}`}
+                </span>
+              </div>
             </>
           ) : (
             <p className="muted">Create or select a note.</p>
@@ -133,6 +190,7 @@ export default function Notes() {
     </div>
   );
 }
+
 
 
 

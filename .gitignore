@@ -22,3 +22,15 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+#structure of css
+| File           | Responsibility          |
+| -------------- | ----------------------- |
+| `landing.css`  | hero, tiles, animations |
+| `notes.css`    | notes layout, editor    |
+| `focus.css`    | timer, presets          |
+| `library.css`  | book cards, grid        |
+| `movies.css`   | movie cards, modal      |
+| `music.css`    | playlists, mini-player  |
+| `news.css`     | cards, reading mode     |
+| `settings.css` | settings sections       |
