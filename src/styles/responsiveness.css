@@ -181,5 +181,28 @@
     text-align: center;
     width: 70px;
   }
+  *{
+    font-size: medium;
+  }
+  .back-to-top{
+    bottom: 70px;
+  }
+  .library-grid{
+    display: grid;
+    grid-template-columns: 1fr 1fr ;
+    column-gap: 25px;
+  }
+  .book-card{
+    height: 200px;
+  }
+  .book-card h3{
+    font-size: medium;
+  }
+  .playlist-card iframe{
+    width: 255px;
+    max-height: 370px;
+    
+  }
+  
 }
 
