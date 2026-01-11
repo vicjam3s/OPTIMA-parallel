@@ -7,7 +7,7 @@ import { ThemeProvider } from "./context/ThemeContext";
 import { AuthProvider } from "./context/AuthContext";
 import { MusicProvider } from "./context/MusicContext";
 
-//import "./styles/index.css"
+import "./styles/index.css"
 import "./styles/layout.css";
 import "./styles/buttons.css";
 

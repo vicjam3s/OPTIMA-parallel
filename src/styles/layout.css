@@ -68,7 +68,7 @@ body {
 /* ================= CONTENT OFFSET ================= */
 
 .app-main {
-  
+  margin-left: 72px;
   padding: 2rem;
   max-width: 1000px;
 }

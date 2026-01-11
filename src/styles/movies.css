@@ -133,6 +133,7 @@
 .modal-card img {
   width: 200px;
   border-radius: 12px;
+  height: 350px;
 }
 
 .modal-content {
@@ -251,4 +252,23 @@
 
 .provider-pill.active {
   color: white;
+}
+
+
+/*---------FAVOURITES----------*/
+.poster-wrapper {
+  position: relative;
+}
+
+.fav-badge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: rgba(250, 204, 21, 0.95);
+  color: #020617;
+  font-size: 0.9rem;
+  font-weight: bold;
+  padding: 4px 8px;
+  border-radius: 999px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
 }

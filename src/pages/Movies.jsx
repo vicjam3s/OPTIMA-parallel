@@ -1,81 +1,81 @@
-
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import MovieModal from "../components/MovieModal";
 
 const TMDB_IMG = "https://image.tmdb.org/t/p/w500";
-const WATCHLIST_KEY = "optima_watchlist";
-const CONTINUE_KEY = "optima_continue_watching";
-
-const PROVIDERS = [
-  { id: 8, name: "Netflix", color: "#E50914" },
-  { id: 9, name: "Prime Video", color: "#00A8E1" },
-  { id: 350, name: "Apple TV", color: "#000000" },
-  { id: 337, name: "Disney+", color: "#113CCF" },
-];
+const API_KEY = import.meta.env.VITE_TMDB_API_KEY;
+const FAVOURITES_KEY = "optima_favourites";
 
 export default function Movies() {
+  /* ---------------- STATE ---------------- */
   const [suggested, setSuggested] = useState([]);
-  const [watchlist, setWatchlist] = useState([]);
-  const [continueWatching, setContinueWatching] = useState([]);
-  const [selected, setSelected] = useState(null);
-
+  const [favourites, setFavourites] = useState([]);
   const [query, setQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
-  const [searching, setSearching] = useState(false);
-
-  const [selectedProviders, setSelectedProviders] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [searching, setSearching] = useState(false);
+  const [selected, setSelected] = useState(null);
 
-  /* ---------------- LOAD LOCAL DATA ---------------- */
+  
+  const [hydrated, setHydrated] = useState(false);
 
+  /* ---------------- LOAD FAVOURITES ---------------- */
   useEffect(() => {
-    setWatchlist(JSON.parse(localStorage.getItem(WATCHLIST_KEY)) || []);
-    setContinueWatching(
-      JSON.parse(localStorage.getItem(CONTINUE_KEY)) || []
-    );
+    const stored = JSON.parse(localStorage.getItem(FAVOURITES_KEY)) || [];
+    setFavourites(stored);
   }, []);
 
-  /* ---------------- PROVIDER FILTER ---------------- */
+  
 
-  const filterByProviders = async (items) => {
-    if (selectedProviders.length === 0) return items;
+  useEffect(() => {
+  const stored = localStorage.getItem(FAVOURITES_KEY);
+  if (stored) {
+    setFavourites(JSON.parse(stored));
+  }
+  setHydrated(true);
+}, []);
 
-    const results = [];
+useEffect(() => {
+  if (!hydrated) return;
+  localStorage.setItem(
+    FAVOURITES_KEY,
+    JSON.stringify(favourites)
+  );
+}, [favourites, hydrated]);
 
-    for (const item of items) {
-      const type = item.media_type === "movie" ? "movie" : "tv";
 
+
+
+
+  /* ---------------- FETCH TRENDING ---------------- */
+  useEffect(() => {
+    const fetchTrending = async () => {
       try {
         const res = await fetch(
-          `https://api.themoviedb.org/3/${type}/${item.id}/watch/providers`,
-          {
-            headers: {
-              Authorization: `Bearer ${import.meta.env.VITE_TMDB_API_KEY}`,
-              "Content-Type": "application/json",
-            },
-          }
+          `https://api.themoviedb.org/3/trending/all/week?api_key=${API_KEY}`
         );
 
+        if (!res.ok) throw new Error("Trending failed");
+
         const data = await res.json();
-        const providers = data.results?.KE?.flatrate || [];
 
-        if (
-          providers.some((p) =>
-            selectedProviders.includes(p.provider_id)
+        setSuggested(
+          data.results.filter(
+            (i) =>
+              (i.media_type === "movie" || i.media_type === "tv") &&
+              i.poster_path
           )
-        ) {
-          results.push(item);
-        }
-      } catch {
-        /* ignore individual failures */
+        );
+      } catch (err) {
+        console.error("Trending error:", err);
+      } finally {
+        setLoading(false);
       }
-    }
+    };
 
-    return results;
-  };
+    fetchTrending();
+  }, []);
 
   /* ---------------- SEARCH ---------------- */
-
   const searchTMDB = async (e) => {
     e.preventDefault();
     if (!query.trim()) return;
@@ -87,108 +87,60 @@ export default function Movies() {
       const res = await fetch(
         `https://api.themoviedb.org/3/search/multi?query=${encodeURIComponent(
           query
-        )}&include_adult=false`,
-        {
-          headers: {
-            Authorization: `Bearer ${import.meta.env.VITE_TMDB_API_KEY}`,
-            "Content-Type": "application/json",
-          },
-        }
+        )}&include_adult=false&api_key=${API_KEY}`
       );
+
+      if (!res.ok) throw new Error("Search failed");
 
       const data = await res.json();
 
-      const filtered = (data.results || []).filter(
-        (i) =>
-          (i.media_type === "movie" || i.media_type === "tv") &&
-          i.poster_path
+      setSearchResults(
+        data.results.filter(
+          (i) =>
+            (i.media_type === "movie" || i.media_type === "tv") &&
+            i.poster_path
+        )
       );
-
-      const finalResults =
-        selectedProviders.length > 0
-          ? await filterByProviders(filtered)
-          : filtered;
-
-      setSearchResults(finalResults);
     } catch (err) {
-      console.error("Search failed:", err);
+      console.error("Search error:", err);
     } finally {
       setSearching(false);
     }
   };
 
-  /* ---------------- SUGGESTIONS (FIXED AUTH) ---------------- */
-
-  useEffect(() => {
-    const fetchSuggestions = async () => {
-      try {
-        const res = await fetch(
-          "https://api.themoviedb.org/3/trending/all/week",
-          {
-            headers: {
-              Authorization: `Bearer ${import.meta.env.VITE_TMDB_API_KEY}`,
-              "Content-Type": "application/json",
-            },
-          }
-        );
-
-        const data = await res.json();
-        setSuggested(data.results || []);
-      } catch (err) {
-        console.error("TMDB error:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchSuggestions();
-  }, []);
-
-  /* ---------------- WATCHLIST ---------------- */
-
-  const toggleWatchlist = (item) => {
-    const exists = watchlist.some(
-      (m) => m.id === item.id && m.media_type === item.media_type
-    );
-
-    const updated = exists
-      ? watchlist.filter(
-          (m) => !(m.id === item.id && m.media_type === item.media_type)
-        )
-      : [...watchlist, item];
-
-    setWatchlist(updated);
-    localStorage.setItem(WATCHLIST_KEY, JSON.stringify(updated));
-  };
-
-  const isSaved = (item) =>
-    watchlist.some(
-      (m) => m.id === item.id && m.media_type === item.media_type
-    );
-
-  /* ---------------- CONTINUE WATCHING ---------------- */
-
-  const startWatching = (item) => {
-    if (
-      continueWatching.some(
-        (m) => m.id === item.id && m.media_type === item.media_type
+  /* ---------------- FAVOURITES ---------------- */
+  const toggleFavourite = (item) => {
+    setFavourites((prev) =>
+      prev.some(
+        (f) => f.id === item.id && f.media_type === item.media_type
       )
-    )
-      return;
-
-    const updated = [{ ...item, progress: 5 }, ...continueWatching];
-    setContinueWatching(updated);
-    localStorage.setItem(CONTINUE_KEY, JSON.stringify(updated));
-  };
-
-  const toggleProvider = (id) => {
-    setSelectedProviders((prev) =>
-      prev.includes(id) ? prev.filter((p) => p !== id) : [...prev, id]
+        ? prev.filter(
+            (f) =>
+              !(f.id === item.id && f.media_type === item.media_type)
+          )
+        : [...prev, item]
     );
   };
 
-  /* ======================= UI ======================= */
+  const isFavourite = (item) =>
+    favourites.some(
+      (f) => f.id === item.id && f.media_type === item.media_type
+    );
 
+  /* ---------------- SORT TRENDING (FAVS FIRST) ---------------- */
+  const sortedTrending = useMemo(() => {
+    const favIds = new Set(
+      favourites.map((f) => `${f.id}-${f.media_type}`)
+    );
+
+    return [...suggested].sort((a, b) => {
+      const aFav = favIds.has(`${a.id}-${a.media_type}`);
+      const bFav = favIds.has(`${b.id}-${b.media_type}`);
+      return bFav - aFav;
+    });
+  }, [suggested, favourites]);
+
+  /* ---------------- UI ---------------- */
   return (
     <section className="movies-page">
       <h1>🎬 Movies & Series</h1>
@@ -196,107 +148,103 @@ export default function Movies() {
       {/* SEARCH */}
       <form className="movie-search" onSubmit={searchTMDB}>
         <input
+          placeholder="Search movies or series…"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search movies or series…"
         />
-        <button className="btn btn-primary" type="submit">
+        <button className="btn primary">
           {searching ? "Searching…" : "Search"}
         </button>
       </form>
 
-      {/* PROVIDER PILLS */}
-      <div className="provider-pills">
-        {PROVIDERS.map((p) => (
-          <button
-            key={p.id}
-            className={`provider-pill ${
-              selectedProviders.includes(p.id) ? "active" : ""
-            }`}
-            style={{
-              borderColor: p.color,
-              background: selectedProviders.includes(p.id)
-                ? p.color
-                : "transparent",
-            }}
-            onClick={() => toggleProvider(p.id)}
-          >
-            {p.name}
-          </button>
-        ))}
-      </div>
-
       {/* SEARCH RESULTS */}
-      {searchResults.length > 0 ? (
+      {searchResults.length > 0 && (
         <>
-          <h2 className="section-title">🔍 Search Results</h2>
+          <h2 className="section-title">🔍 Results</h2>
           <div className="movie-grid">
             {searchResults.map((item) => (
-              <div
-                key={`${item.id}-${item.media_type}`}
-                className="movie-card"
+              <MovieCard
+                key={`search-${item.id}`}
+                item={item}
+                isFavourite={isFavourite(item)}
+                onFavourite={() => toggleFavourite(item)}
                 onClick={() => setSelected(item)}
-              >
-                <img
-                  src={`${TMDB_IMG}${item.poster_path}`}
-                  alt={item.title || item.name}
-                />
-                <div className="movie-info">
-                  <h3>{item.title || item.name}</h3>
-                </div>
-              </div>
+              />
             ))}
           </div>
         </>
-      ) : (
-        !searching &&
-        query && (
-          <p className="muted">No results found for your search.</p>
-        )
       )}
 
-      {/* SUGGESTIONS */}
-      <h2 className="section-title">🔥 Suggested for You</h2>
+      {/* FAVOURITES */}
+      {favourites.length > 0 && (
+        <>
+          <h2 className="section-title">⭐ Your Favourites</h2>
+          <div className="movie-grid">
+            {favourites.map((item) => (
+              <MovieCard
+                key={`fav-${item.id}`}
+                item={item}
+                isFavourite
+                onFavourite={() => toggleFavourite(item)}
+                onClick={() => setSelected(item)}
+              />
+            ))}
+          </div>
+        </>
+      )}
+
+      {/* TRENDING */}
+      <h2 className="section-title">🔥 Trending</h2>
       {loading && <p className="muted">Loading…</p>}
 
       <div className="movie-grid">
-        {suggested.map((item) => (
-          <div
-            key={`${item.id}-${item.media_type}`}
-            className="movie-card"
+        {sortedTrending.map((item) => (
+          <MovieCard
+            key={`trend-${item.id}`}
+            item={item}
+            isFavourite={isFavourite(item)}
+            onFavourite={() => toggleFavourite(item)}
             onClick={() => setSelected(item)}
-          >
-            {item.poster_path && (
-              <img
-                src={`${TMDB_IMG}${item.poster_path}`}
-                alt={item.title || item.name}
-              />
-            )}
-            <div className="movie-info">
-              <h3>{item.title || item.name}</h3>
-              <button
-                className={`watchlist-btn ${
-                  isSaved(item) ? "saved" : ""
-                }`}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  toggleWatchlist(item);
-                }}
-              >
-                {isSaved(item) ? "★ Watchlisted" : "☆ Add to Watchlist"}
-              </button>
-            </div>
-          </div>
+          />
         ))}
       </div>
 
+      {/* MODAL */}
       {selected && (
-        <MovieModal
-          item={selected}
-          onClose={() => setSelected(null)}
-          onWatch={startWatching}
-        />
+        <MovieModal item={selected} onClose={() => setSelected(null)} />
       )}
     </section>
   );
 }
+
+/* ---------------- CARD ---------------- */
+
+function MovieCard({ item, onClick, onFavourite, isFavourite }) {
+  return (
+    <div className="movie-card" onClick={onClick}>
+      <div className="poster-wrapper">
+        <img
+          src={`${TMDB_IMG}${item.poster_path}`}
+          alt={item.title || item.name}
+        />
+
+        {isFavourite && <span className="fav-badge">★</span>}
+      </div>
+
+      <div className="movie-info">
+        <h3>{item.title || item.name}</h3>
+
+        <button
+          className={`watchlist-btn ${isFavourite ? "saved" : ""}`}
+          onClick={(e) => {
+            e.stopPropagation();
+            onFavourite();
+          }}
+        >
+          {isFavourite ? "★ Favourite" : "☆ Favourite"}
+        </button>
+      </div>
+    </div>
+  );
+}
+

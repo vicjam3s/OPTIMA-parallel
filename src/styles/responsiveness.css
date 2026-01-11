@@ -167,6 +167,9 @@
     margin-left: 0;
     padding-bottom: 88px;
   }
+  .back-to-top{
+    bottom: 70px;
+  }
 }
 @media (max-width: 360px) {
   .app-main {
@@ -206,3 +209,12 @@
   
 }
 
+@media (max-width: 500px) {
+  .app-main {
+    margin-left: 0;
+    padding-bottom: 88px;
+  }
+  .back-to-top{
+    bottom: 70px;
+  }
+}

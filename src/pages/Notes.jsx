@@ -10,37 +10,48 @@ export default function Notes() {
   const [lastSaved, setLastSaved] = useState("");
 
   const hydrated = useRef(false);
-  const saveTimeout = useRef(null);
+const saveTimeout = useRef(null);
 
-  /* ---------- LOAD (HYDRATION GUARD) ---------- */
-  useEffect(() => {
-    try {
-      const stored = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-      setNotes(stored);
-      if (stored.length > 0) setActiveId(stored[0].id);
-      hydrated.current = true;
-    } catch {
-      setNotes([]);
-      hydrated.current = true;
-    }
-  }, []);
+/* ---------- LOAD (SAFE HYDRATION) ---------- */
+useEffect(() => {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    const stored = raw ? JSON.parse(raw) : [];
+    setNotes(stored);
+    if (stored.length > 0) setActiveId(stored[0].id);
+  } catch (err) {
+    console.warn("Invalid notes storage, resetting.");
+    localStorage.removeItem(STORAGE_KEY);
+    setNotes([]);
+  } finally {
+    hydrated.current = true;
+  }
+}, []);
+
 
   /* ---------- DEBOUNCED AUTOSAVE ---------- */
   useEffect(() => {
-    if (!hydrated.current) return;
+  if (!hydrated.current) return;
 
-    if (saveTimeout.current) {
-      clearTimeout(saveTimeout.current);
-    }
+  clearTimeout(saveTimeout.current);
 
-    saveTimeout.current = setTimeout(() => {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(notes));
-      setLastSaved("Saved");
-      setTimeout(() => setLastSaved(""), 1200);
-    }, SAVE_DELAY);
+  saveTimeout.current = setTimeout(() => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(notes));
+    setLastSaved("Saved");
+    setTimeout(() => setLastSaved(""), 1200);
+  }, 500);
 
-    return () => clearTimeout(saveTimeout.current);
-  }, [notes]);
+  return () => clearTimeout(saveTimeout.current);
+}, [notes]);
+
+  useEffect(() => {
+  return () => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(notes));
+  };
+}, [notes]);
+
+
+
 
   /* ---------- FORCE SAVE ON UNMOUNT ---------- */
   useEffect(() => {
