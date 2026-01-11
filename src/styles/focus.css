@@ -24,25 +24,7 @@
   margin-bottom: 1.5rem;
 }
 
-.preset-btn {
-  padding: 0.45rem 0.9rem;
-  border-radius: 999px;
-  font-size: 0.85rem;
-  font-weight: 600;
 
-  background: transparent;
-  color: var(--text-muted);
-  border: 1px solid var(--border-subtle);
-
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.preset-btn:hover {
-  background: rgba(129, 140, 248, 0.15);
-  color: var(--text-main);
-  border-color: var(--accent);
-}
 /* ================= CUSTOM TIMER ================= */
 
 .custom-timer {

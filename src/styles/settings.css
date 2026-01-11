@@ -20,3 +20,18 @@ details summary {
   font-weight: 600;
   margin-bottom: 0.5rem;
 }
+
+/* ================= LIGHT THEME ================= */
+[data-theme="light"] {
+  --bg-main: #f8fafc;
+  --bg-surface: #ffffff;
+  --border-subtle: #e2e8f0;
+
+  --text-main: #020617;
+  --text-muted: #475569;
+
+  --accent: #6366f1;        /* same indigo, slightly toned */
+  --accent-soft: #818cf8;
+
+  --card-bg: #ffffff;
+}

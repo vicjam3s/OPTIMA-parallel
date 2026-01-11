@@ -90,3 +90,96 @@
     width: 100%;
   }
 }
+
+
+/*-----------MOVIES------------*/
+@media (max-width: 600px) {
+  .modal-card {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .modal-card img {
+    width: 160px;
+  }
+}
+
+/* ================= MUSIC MINIPLAYER ================= */
+
+@media (max-width: 600px) {
+  .global-mini-player {
+    bottom: 0.75rem;
+    padding: 0.5rem 0.85rem;
+  }
+
+  .mini-title {
+    max-width: 100px;
+  }
+}
+
+
+/* =============MOBILE READING MODE MODAL-NEWS ========== */
+@media (max-width: 600px) {
+  .modal-card.reading-mode {
+    padding: 1.25rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .feature-card {
+    transition: none;
+  }
+}
+
+/* ================= RESPONSIVE BREAKPOINT-LAYOUT ================= */
+
+@media (max-width: 900px) {
+  .desktop-only {
+    display: none;
+  }
+
+  .hamburger {
+    display: block;
+  }
+
+  .mobile-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+
+    padding: 1rem 1.25rem;
+    background: var(--bg-surface);
+    border-top: 1px solid var(--border-subtle);
+  }
+
+  .mobile-menu .btn,
+  .mobile-menu .theme-toggle {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/*---------APP CONTENT----------*/
+
+@media (max-width: 900px) {
+  .app-main {
+    margin-left: 0;
+    padding-bottom: 88px;
+  }
+}
+@media (max-width: 360px) {
+  .app-main {
+    margin-left: 0;
+    padding-bottom: 88px;
+    width: 280px;
+  } 
+  
+  .feature-card{
+    height: 100px;
+    font-size: 11px;
+    text-align: center;
+    width: 70px;
+  }
+}
+

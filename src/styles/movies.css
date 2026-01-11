@@ -1,5 +1,83 @@
+/* ================= MOVIES ================= */
+
 .movies-page {
   max-width: 1100px;
+}
+
+.movies-search {
+  margin: 1.5rem 0 2rem;
+  display: flex;
+  gap: 0.75rem;
+}
+
+.movies-search input {
+  flex: 1;
+  padding: 0.7rem 0.9rem;
+  border-radius: 8px;
+  border: 1px solid #1e293b;
+  background: #020617;
+  color: #e5e7eb;
+}
+
+.movies-search input:focus {
+  outline: none;
+  border-color: #818cf8;
+}
+
+.movies-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 1.25rem;
+}
+
+.movie-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+}
+
+.movie-card:hover {
+  border-color: var(--accent);
+}
+
+.movie-card img {
+  width: 100%;
+  height: 270px;
+  object-fit: cover;
+}
+
+.poster-placeholder {
+  height: 270px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #64748b;
+  font-size: 0.9rem;
+  background: #020617;
+}
+
+.movie-info {
+  padding: 0.9rem;
+}
+
+.movie-info h3 {
+  font-size: 0.95rem;
+  margin-bottom: 0.25rem;
+}
+
+.rating {
+  margin-top: 0.25rem;
+  font-size: 0.85rem;
+  color: #facc15;
+}
+/*===UPDATE===*/
+.movies-page img {
+  width: 100%;
+  border-radius: 12px;
+}
+
+.section-title {
+  margin: 2rem 0 1rem;
 }
 
 .movie-grid {
@@ -9,7 +87,168 @@
 }
 
 .movie-card {
+  background: var(--bg-surface);
   border: 1px solid var(--border-subtle);
   border-radius: 16px;
   overflow: hidden;
+
+  display: flex;
+  flex-direction: column;
+}
+
+.movie-info {
+  padding: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+/* ================= MOVIE MODAL ================= */
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(2, 6, 23, 0.75);
+  backdrop-filter: blur(6px);
+  z-index: 2000;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-card {
+  background: var(--bg-surface);
+  border-radius: 16px;
+  max-width: 720px;
+  width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+
+  display: flex;
+  gap: 1rem;
+  padding: 1rem;
+}
+
+.modal-card img {
+  width: 200px;
+  border-radius: 12px;
+}
+
+.modal-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.modal-overview {
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+/* ================= TRAILER ================= */
+
+.trailer iframe {
+  width: 100%;
+  height: 240px;
+  border-radius: 12px;
+  border: none;
+  margin-top: 0.75rem;
+}
+
+/* ================= WATCH PROVIDERS ================= */
+
+.providers {
+  margin-top: 1rem;
+}
+
+.provider-list {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-top: 0.5rem;
+}
+
+.provider img {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  background: white;
+  padding: 4px;
+}
+/* ================= NETFLIX LINK ================= */
+
+.provider-netflix {
+  border-radius: 12px;
+  padding: 6px;
+  background: #000;
+  transition: transform 0.2s ease;
+}
+
+.provider-netflix:hover {
+  transform: scale(1.05);
+}
+
+/* ================= MOVIE SEARCH ================= */
+
+.movie-search {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.movie-search input {
+  flex: 1;
+  min-width: 220px;
+  padding: 0.6rem 0.8rem;
+  border-radius: 10px;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-surface);
+  color: var(--text-main);
+}
+
+.netflix-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+/* ================= PROVIDER PILLS ================= */
+
+.provider-pills {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.25rem;
+}
+
+.provider-pill {
+  padding: 0.35rem 0.7rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+
+  border: 1px solid;
+  color: var(--text-main);
+  background: transparent;
+
+  transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+.provider-pill:hover {
+  transform: translateY(-1px);
+  opacity: 0.9;
+}
+
+.provider-pill.active {
+  color: white;
 }

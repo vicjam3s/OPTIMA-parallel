@@ -1,3 +1,32 @@
+/* ================= E-LIBRARY ================= */
+
+
+
+.library-search {
+  margin: 1.5rem 0 2rem;
+  display: flex;
+  gap: 0.75rem;
+}
+
+.library-search input {
+  flex: 1;
+  padding: 0.7rem 0.9rem;
+  border-radius: 8px;
+  border: 1px solid #1e293b;
+  background: #020617;
+  color: #e5e7eb;
+  font-size: 0.95rem;
+}
+
+.library-search input::placeholder {
+  color: #64748b;
+}
+
+.library-search input:focus {
+  outline: none;
+  border-color: #818cf8;
+}
+
 .library-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
@@ -5,14 +34,44 @@
 }
 
 .book-card {
+  position: relative;
   height: 280px;
   border-radius: var(--radius-lg);
+  overflow: hidden;
+
   background-size: cover;
   background-position: center;
-  position: relative;
-  overflow: hidden;
+  background-repeat: no-repeat;
+
+  display: flex;
+  align-items: flex-end;
+
+  cursor: pointer;
+  border: 1px solid var(--border-subtle);
+  transition: transform 0.25s ease, border-color 0.25s ease;
 }
 
+.book-card:hover {
+  transform: translateY(-6px);
+  border-color: var(--accent);
+}
+.book-card h3 {
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.book-card .year {
+  margin-top: 0.5rem;
+  font-size: 0.8rem;
+  color: #64748b;
+}
+
+.error {
+  color: #f87171;
+  margin-top: 1rem;
+}
+
+/* Dark overlay */
 .book-card::before {
   content: "";
   position: absolute;
@@ -22,4 +81,26 @@
     rgba(2, 6, 23, 0.85),
     rgba(2, 6, 23, 0.35)
   );
+  z-index: 0;
+}
+
+.book-overlay {
+  position: relative;
+  z-index: 1;
+  padding: 1rem;
+}
+.book-overlay h3 {
+  font-size: 1rem;
+  margin-bottom: 0.25rem;
+  color: #e5e7eb;
+}
+
+.book-overlay .author {
+  font-size: 0.85rem;
+  color: #c7d2fe;
+}
+
+.book-overlay .year {
+  font-size: 0.75rem;
+  color: #94a3b8;
 }

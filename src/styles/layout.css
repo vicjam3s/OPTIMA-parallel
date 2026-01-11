@@ -1,7 +1,74 @@
+/* ================= DESIGN TOKENS ================= */
+:root {
+  --bg-main: #020617;
+  --bg-surface: #020617;
+  --border-subtle: #1e293b;
+
+  --text-main: #e5e7eb;
+  --text-muted: #94a3b8;
+
+  --accent: #818cf8;
+  --accent-soft: #a5b4fc;
+
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+
+  --space-1: 0.5rem;
+  --space-2: 0.75rem;
+  --space-3: 1rem;
+  --space-4: 1.5rem;
+  --space-5: 2rem;
+}
+*{
+  font-family: berlin sans fb;
+  font-weight: bold;
+  font-size: large;
+}
+
+/* ================= PAGE WRAPPER ================= */
+
+.dashboard-main > div {
+  animation: fadeUp 0.45s ease;
+}
+
+h1 {
+  margin-bottom: var(--space-2);
+  font-size: 2rem;
+}
+
+.muted {
+  color: var(--text-muted);
+  margin-bottom: var(--space-4);
+}
+
+/* ---------- COLORS ---------- */
+:root {
+  --bg-main: #020617;
+  --bg-soft: #020617;
+  --accent: #818cf8;
+  --accent-soft: #a5b4fc;
+  --text-main: #e5e7eb;
+  --text-muted: #94a3b8;
+  --card-bg: #020617;
+  --border: #1e293b;
+}
+
+/* ---------- BASE ---------- */
+body {
+  background: radial-gradient(circle at top, #020617, #020617);
+  color: var(--text-main);
+  margin-top: 0%;
+}
+
+
+
+
+
 /* ================= CONTENT OFFSET ================= */
 
 .app-main {
-  margin-left: 80px;
+  
   padding: 2rem;
   max-width: 1000px;
 }
@@ -14,12 +81,7 @@
 
 
 
-@media (max-width: 900px) {
-  .app-main {
-    margin-left: 0;
-    padding-bottom: 88px;
-  }
-}
+
 
 /* ================= NAVBAR ================= */
 
@@ -106,33 +168,7 @@
   display: none;
 }
 
-/* ================= RESPONSIVE BREAKPOINT ================= */
 
-@media (max-width: 900px) {
-  .desktop-only {
-    display: none;
-  }
-
-  .hamburger {
-    display: block;
-  }
-
-  .mobile-menu {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-
-    padding: 1rem 1.25rem;
-    background: var(--bg-surface);
-    border-top: 1px solid var(--border-subtle);
-  }
-
-  .mobile-menu .btn,
-  .mobile-menu .theme-toggle {
-    width: 100%;
-    justify-content: center;
-  }
-}
 
 
 /* ================= MOBILE ================= */
@@ -215,3 +251,53 @@
   padding: 5rem 0 2rem;
 }
 
+/*==========AUTH LOADING============*/
+.auth-loading {
+  padding: 3rem;
+  text-align: center;
+  color: #94a3b8;
+}
+
+/* ================= LOGOUT OVERLAY ================= */
+
+.logout-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(2, 6, 23, 0.6);
+  backdrop-filter: blur(4px);
+  z-index: 2000;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.logout-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  padding: 1.5rem 2rem;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+
+  color: var(--text-main);
+}
+
+/* Spinner */
+.spinner {
+  width: 28px;
+  height: 28px;
+  border: 3px solid var(--border-subtle);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

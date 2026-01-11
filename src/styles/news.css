@@ -1,25 +1,241 @@
+/* ================= NEWS ================= */
+
+
 .news-list {
+  margin-top: 2rem;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: 1fr 1fr 1fr;
+  column-gap: 1.45rem;
+  row-gap: 1.45rem ;
 }
 
 .news-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
   position: relative;
   border-radius: var(--radius-lg);
   overflow: hidden;
-  padding: 1.25rem;
+
   background-size: cover;
   background-position: center;
+  background-repeat: no-repeat;
+
+  padding: 1.25rem;
+  cursor: pointer;
+
+  border: 1px solid var(--border-subtle);
+  transition: transform 0.25s ease, border-color 0.25s ease;
+}
+.news-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--accent);
 }
 
+.news-card h3 {
+  font-size: 1.05rem;
+  margin-bottom: 0.5rem;
+  color: #e5e7eb;
+  font-family: candara;
+}
+
+.news-source {
+  display: inline-block;
+  margin-bottom: 0.5rem;
+  font-size: 0.75rem;
+  color: #c7d2fe;
+  background: rgba(129, 140, 248, 0.18);
+  padding: 0.25rem 0.6rem;
+  border-radius: 999px;
+  font-family: candara;
+  
+}
+
+.news-desc {
+  font-size: 0.95rem;
+  color: #e5e7eb;
+  margin-bottom: 1rem;
+  line-height: 1.5;
+  font-family: candara;
+}
+
+.news-link {
+  text-decoration: none;
+  color: #818cf8;
+  font-size: 0.9rem;
+}
+
+.news-link:hover {
+  text-decoration: underline;
+}
+
+/* Content layer */
+.news-overlay {
+  position: relative;
+  z-index: 1;
+}
+/* Dark overlay */
 .news-card::before {
   content: "";
   position: absolute;
   inset: 0;
   background: linear-gradient(
     to top,
-    rgba(2, 6, 23, 0.9),
+    rgba(2, 6, 23, 0.958),
     rgba(2, 6, 23, 0.45)
   );
+  z-index: 0;
 }
+
+
+/* ================= READING MODE ================= */
+
+.reading-mode {
+  max-width: 720px;
+}
+
+.reading-text {
+  margin-top: 1rem;
+  font-size: 1rem;
+  line-height: 1.7;
+  color: #e5e7eb;
+  
+}
+
+/* Actions */
+.news-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+}
+
+/* ================= READING MODE MODAL ================= */
+
+.modal-card.reading-mode {
+  flex-direction: column;     /* FORCE VERTICAL */
+  max-width: 720px;
+  width: 100%;
+  gap: 1rem;
+}
+
+/* Improve reading flow */
+.modal-card.reading-mode h2 {
+  font-size: 1.5rem;
+  line-height: 1.3;
+  font-family: candara;
+}
+
+.modal-card.reading-mode .reading-text {
+  font-size: 1rem;
+  line-height: 1.7;
+  color: #e5e7eb;
+  font-family: candara;
+}
+
+/* Action buttons at bottom */
+.modal-card.reading-mode .modal-actions {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1rem;
+  justify-content: flex-end;
+}
+
+
+
+input,
+textarea {
+  border-radius: var(--radius-md);
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+input:focus,
+textarea:focus {
+  border-color: var(--accent);
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .feature-card {
+    transition: none;
+  }
+}
+
+/* ================= NEWS CONTROLS ================= */
+
+.news-search {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.news-search input {
+  flex: 1;
+  padding: 0.6rem 0.8rem;
+  border-radius: 8px;
+  border: 1px solid #1e293b;
+  background: #020617;
+  color: #e5e7eb;
+}
+
+.news-categories {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+}
+
+.chip {
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  border: 1px solid #1e293b;
+  background: transparent;
+  color: #94a3b8;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+.chip.active {
+  background: rgba(129, 140, 248, 0.2);
+  color: #e5e7eb;
+  border-color: #818cf8;
+}
+
+/* ================= BOOKMARK ================= */
+
+.news-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.bookmark {
+  background: transparent;
+  border: none;
+  font-size: 1.25rem;
+  cursor: pointer;
+  color: #64748b;
+}
+
+.bookmark.saved {
+  color: #facc15;
+}
+
+.saved-title {
+  margin: 2.5rem 0 1rem;
+}
+
+.news-card.saved {
+  border-color: #facc15;
+}
+
