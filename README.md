@@ -19,7 +19,7 @@ Optima is a modern, productivity-focused web application designed to help users 
 
 * **Frontend Framework:** React
 * **Build Tool:** Vite
-* **Styling:** CSS / Tailwind CSS (depending on configuration)
+* **Styling:** normalCSS 
 * **Language:** JavaScript (ES6+)
 * **Version Control:** Git & GitHub
 
