@@ -117,19 +117,23 @@ Contributions are welcome!
 
 ## 📄 License
 
-This project is licensed under the MIT License.
+This project has no current license.
 
 ---
 
 ## 👤 Author
 
-Developed as part of a learning and project-based workflow to explore modern React development and UI design best practices.
+Developed as part of a learning and project-based workflow to explore modern React development and UI design best practices. Also to create something new, modern and fun for people who enjoy learning with additional motivation, and entertainment [;)]
 
 ---
 
-If you’d like, I can also:
+## Before cloning, create a .env file and have the following in order to access APIs:
+VITE_TMDB_API_KEY=your_tmdb_api_key
+VITE_GNEWS_API_KEY=your_gnews_api_key
+VITE_FIREBASE_API_KEY=your_firebase_api_key
+VITE_FIREBASE_AUTH_DOMAIN=your_firebase_auth_domain
+VITE_FIREBASE_PROJECT_ID=your_firebase_project_id
+VITE_FIREBASE_APP_ID= your_firebase_app_id
 
-* Customize this README to match **exact Optima features**
-* Add **screenshots & badges**
-* Write a **deployment section (Vercel/Netlify)**
-* Convert it into a **GitHub-optimized README**
++Then restart server and reload on vercel
+
