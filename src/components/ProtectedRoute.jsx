@@ -5,6 +5,8 @@ export default function ProtectedRoute({ children }) {
   const { user, loading } = useAuth();
   const location = useLocation();
 
+  
+
   if (loading) {
     return <p className="auth-loading">Checking authentication…</p>;
   }

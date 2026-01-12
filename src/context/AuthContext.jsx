@@ -1,4 +1,6 @@
 import { createContext, useContext, useEffect, useState } from "react";
+import { onAuthStateChanged, signOut } from "firebase/auth";
+import { auth } from "../firebase";
 
 const AuthContext = createContext();
 
@@ -6,30 +8,29 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Simulate auth persistence (Firebase-ready)
   useEffect(() => {
-    const isAuth = localStorage.getItem("optima_auth") === "true";
-    if (isAuth) setUser({ name: "Demo User" });
-    setLoading(false);
+    const unsub = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+      setLoading(false);
+    });
+
+    return unsub;
   }, []);
 
-  const login = () => {
-    localStorage.setItem("optima_auth", "true");
-    setUser({ name: "Demo User" });
-  };
-
+  // ✅ THIS WAS MISSING OR INCORRECT
   const logout = () => {
-    localStorage.removeItem("optima_auth");
-    setUser(null);
+    return signOut(auth);
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, loading }}>
-      {children}
+    <AuthContext.Provider value={{ user, loading, logout }}>
+      {!loading && children}
     </AuthContext.Provider>
   );
 }
 
-export function useAuth() {
-  return useContext(AuthContext);
-}
+export const useAuth = () => useContext(AuthContext);
+
+
+
+

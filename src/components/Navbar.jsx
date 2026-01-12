@@ -1,15 +1,17 @@
-import { Link } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useEffect, useState } from "react";
-import { NavLink} from "react-router-dom";
 
 export default function Navbar() {
-  const { user, logout } = useAuth();
+  const auth = useAuth();               // ✅ defensive access
+  const user = auth?.user;
+  const logout = auth?.logout;
+
   const [theme, setTheme] = useState("dark");
   const [menuOpen, setMenuOpen] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
 
-  // Load saved theme
+  /* ---------- LOAD THEME ---------- */
   useEffect(() => {
     const saved = localStorage.getItem("optima_theme") || "dark";
     setTheme(saved);
@@ -23,7 +25,10 @@ export default function Navbar() {
     localStorage.setItem("optima_theme", newTheme);
   };
 
-  const handleLogout = () => {
+  /* ---------- LOGOUT ---------- */
+  const handleLogout = async () => {
+    if (!logout) return; // ✅ prevents crash
+
     const confirmed = window.confirm(
       "Are you sure you want to log out?"
     );
@@ -32,10 +37,11 @@ export default function Navbar() {
     setMenuOpen(false);
     setLoggingOut(true);
 
-    setTimeout(() => {
-      logout();
-      setLoggingOut(false);
-    }, 2000);
+    try {
+      await logout();     // ✅ real Firebase signOut
+    } finally {
+      setTimeout(() => setLoggingOut(false), 800);
+    }
   };
 
   return (
@@ -49,14 +55,20 @@ export default function Navbar() {
           {/* DESKTOP ACTIONS */}
           <nav className="navbar-actions desktop-only">
             {user && (
-             <NavLink to="/Settings" className="nav-item" title="Settings">
-               ⚙️
-             </NavLink>
+              <NavLink
+                to="/settings"
+                className="nav-item"
+                title="Settings"
+              >
+                ⚙️
+              </NavLink>
             )}
 
-            
             {user ? (
-              <button className="btn btn-ghost" onClick={handleLogout}>
+              <button
+                className="btn btn-ghost"
+                onClick={handleLogout}
+              >
                 Logout
               </button>
             ) : (
@@ -84,7 +96,15 @@ export default function Navbar() {
         {/* MOBILE MENU */}
         {menuOpen && (
           <div className="mobile-menu">
-            
+            {user && (
+              <NavLink
+                to="/settings"
+                className="btn btn-ghost"
+                onClick={() => setMenuOpen(false)}
+              >
+                Settings
+              </NavLink>
+            )}
 
             {user ? (
               <button
@@ -127,5 +147,6 @@ export default function Navbar() {
     </>
   );
 }
+
 
 

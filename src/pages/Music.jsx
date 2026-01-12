@@ -1,9 +1,14 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import {
+  collection,
+  doc,
+  setDoc,
+  deleteDoc,
+  onSnapshot,
+} from "firebase/firestore";
+import { db } from "../firebase";
+import { useAuth } from "../context/AuthContext";
 import { useMusic } from "../context/MusicContext";
-import usePersistentState from "../hooks/usePersistentState";
-
-const FAVORITES_KEY = "optima_music_favorites";
-const CUSTOM_KEY = "optima_music_custom";
 
 /* ---------- DEFAULT PLAYLISTS ---------- */
 const DEFAULT_PLAYLISTS = [
@@ -26,68 +31,113 @@ const DEFAULT_PLAYLISTS = [
 ];
 
 export default function Music() {
+  const { user } = useAuth();
   const { nowPlaying } = useMusic();
 
-  const [favorites, setFavorites] = usePersistentState(
-    FAVORITES_KEY,
-    []
-  );
-  const [customPlaylists, setCustomPlaylists] =
-    usePersistentState(CUSTOM_KEY, []);
-
+  const [favorites, setFavorites] = useState([]);
+  const [customPlaylists, setCustomPlaylists] = useState([]);
   const [customUrl, setCustomUrl] = useState("");
 
+  /* ---------- LOAD FAVORITES ---------- */
+  useEffect(() => {
+    if (!user) return;
+
+    const ref = collection(db, "users", user.uid, "musicFavorites");
+
+    const unsub = onSnapshot(ref, (snap) => {
+      setFavorites(snap.docs.map((d) => d.data()));
+    });
+
+    return () => unsub();
+  }, [user]);
+
+  /* ---------- LOAD CUSTOM PLAYLISTS ---------- */
+  useEffect(() => {
+    if (!user) return;
+
+    const ref = collection(db, "users", user.uid, "musicPlaylists");
+
+    const unsub = onSnapshot(ref, (snap) => {
+      setCustomPlaylists(snap.docs.map((d) => d.data()));
+    });
+
+    return () => unsub();
+  }, [user]);
+
   /* ---------- FAVORITES ---------- */
-  const toggleFavorite = (playlist) => {
-    const exists = favorites.some((p) => p.id === playlist.id);
-    setFavorites(
-      exists
-        ? favorites.filter((p) => p.id !== playlist.id)
-        : [...favorites, playlist]
+  const toggleFavorite = async (playlist) => {
+    if (!user) return;
+
+    const ref = doc(
+      db,
+      "users",
+      user.uid,
+      "musicFavorites",
+      playlist.id
     );
+
+    const exists = favorites.some((p) => p.id === playlist.id);
+
+    if (exists) {
+      await deleteDoc(ref);
+    } else {
+      await setDoc(ref, playlist);
+    }
   };
 
   const isFavorite = (playlist) =>
     favorites.some((p) => p.id === playlist.id);
 
-  /* ---------- CUSTOM PLAYLIST ---------- */
+  /* ---------- ADD CUSTOM PLAYLIST ---------- */
   const addCustomPlaylist = async () => {
-  if (!customUrl.includes("spotify.com")) return;
+    if (!customUrl.includes("spotify.com") || !user) return;
 
-  const embedUrl = customUrl.replace(
-    "open.spotify.com",
-    "open.spotify.com/embed"
-  );
-
-  let title = "Custom Playlist";
-
-  try {
-    const res = await fetch(
-      `https://open.spotify.com/oembed?url=${encodeURIComponent(
-        customUrl
-      )}`
+    const embedUrl = customUrl.replace(
+      "open.spotify.com",
+      "open.spotify.com/embed"
     );
-    const data = await res.json();
-    if (data?.title) title = data.title;
-  } catch {
-    console.warn("Failed to fetch playlist title");
-  }
 
-  const newPlaylist = {
-    id: Date.now(),
-    title,
-    description: "Added by you",
-    embed: embedUrl,
+    let title = "Custom Playlist";
+
+    try {
+      const res = await fetch(
+        `https://open.spotify.com/oembed?url=${encodeURIComponent(
+          customUrl
+        )}`
+      );
+      const data = await res.json();
+      if (data?.title) title = data.title;
+    } catch {
+      console.warn("Failed to fetch playlist title");
+    }
+
+    const newPlaylist = {
+      id: Date.now().toString(),
+      title,
+      description: "Added by you",
+      embed: embedUrl,
+    };
+
+    await setDoc(
+      doc(
+        db,
+        "users",
+        user.uid,
+        "musicPlaylists",
+        newPlaylist.id
+      ),
+      newPlaylist
+    );
+
+    setCustomUrl("");
   };
 
-  setCustomPlaylists((prev) => [newPlaylist, ...prev]);
-  setCustomUrl("");
-};
+  /* ---------- REMOVE CUSTOM PLAYLIST ---------- */
+  const removeCustomPlaylist = async (id) => {
+    if (!user) return;
 
-
-  const removeCustomPlaylist = (id) => {
-    setCustomPlaylists((prev) =>
-      prev.filter((p) => p.id !== id)
+    await deleteDoc(
+      doc(db, "users", user.uid, "musicPlaylists", id)
     );
   };
 
@@ -209,3 +259,4 @@ function PlaylistCard({ playlist, onSave, onRemove, saved }) {
     </div>
   );
 }
+

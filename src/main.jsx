@@ -10,6 +10,7 @@ import { MusicProvider } from "./context/MusicContext";
 import "./styles/index.css"
 import "./styles/layout.css";
 import "./styles/buttons.css";
+import "./styles/auth.css"
 
 import "./styles/landing.css";
 import "./styles/notes.css";

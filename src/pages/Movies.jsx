@@ -1,11 +1,21 @@
 import { useEffect, useState, useMemo } from "react";
+import {
+  collection,
+  doc,
+  setDoc,
+  deleteDoc,
+  onSnapshot,
+} from "firebase/firestore";
+import { db } from "../firebase";
+import { useAuth } from "../context/AuthContext";
 import MovieModal from "../components/MovieModal";
 
 const TMDB_IMG = "https://image.tmdb.org/t/p/w500";
 const API_KEY = import.meta.env.VITE_TMDB_API_KEY;
-const FAVOURITES_KEY = "optima_favourites";
 
 export default function Movies() {
+  const { user } = useAuth();
+
   /* ---------------- STATE ---------------- */
   const [suggested, setSuggested] = useState([]);
   const [favourites, setFavourites] = useState([]);
@@ -15,36 +25,19 @@ export default function Movies() {
   const [searching, setSearching] = useState(false);
   const [selected, setSelected] = useState(null);
 
-  
-  const [hydrated, setHydrated] = useState(false);
-
-  /* ---------------- LOAD FAVOURITES ---------------- */
+  /* ---------------- LOAD FAVOURITES (USER-SCOPED) ---------------- */
   useEffect(() => {
-    const stored = JSON.parse(localStorage.getItem(FAVOURITES_KEY)) || [];
-    setFavourites(stored);
-  }, []);
+    if (!user) return;
 
-  
+    const ref = collection(db, "users", user.uid, "favourites");
 
-  useEffect(() => {
-  const stored = localStorage.getItem(FAVOURITES_KEY);
-  if (stored) {
-    setFavourites(JSON.parse(stored));
-  }
-  setHydrated(true);
-}, []);
+    const unsub = onSnapshot(ref, (snap) => {
+      const data = snap.docs.map((d) => d.data());
+      setFavourites(data);
+    });
 
-useEffect(() => {
-  if (!hydrated) return;
-  localStorage.setItem(
-    FAVOURITES_KEY,
-    JSON.stringify(favourites)
-  );
-}, [favourites, hydrated]);
-
-
-
-
+    return () => unsub();
+  }, [user]);
 
   /* ---------------- FETCH TRENDING ---------------- */
   useEffect(() => {
@@ -108,18 +101,27 @@ useEffect(() => {
     }
   };
 
-  /* ---------------- FAVOURITES ---------------- */
-  const toggleFavourite = (item) => {
-    setFavourites((prev) =>
-      prev.some(
-        (f) => f.id === item.id && f.media_type === item.media_type
-      )
-        ? prev.filter(
-            (f) =>
-              !(f.id === item.id && f.media_type === item.media_type)
-          )
-        : [...prev, item]
+  /* ---------------- FAVOURITES (FIRESTORE) ---------------- */
+  const toggleFavourite = async (item) => {
+    if (!user) return;
+
+    const favRef = doc(
+      db,
+      "users",
+      user.uid,
+      "favourites",
+      `${item.id}-${item.media_type}`
     );
+
+    const exists = favourites.some(
+      (f) => f.id === item.id && f.media_type === item.media_type
+    );
+
+    if (exists) {
+      await deleteDoc(favRef);
+    } else {
+      await setDoc(favRef, item);
+    }
   };
 
   const isFavourite = (item) =>
@@ -247,4 +249,3 @@ function MovieCard({ item, onClick, onFavourite, isFavourite }) {
     </div>
   );
 }
-

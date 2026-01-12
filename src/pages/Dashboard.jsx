@@ -9,6 +9,7 @@ export default function Dashboard() {
       <main className="dashboard-main">
         <Outlet />
       </main>
+      
     </div>
   );
 }

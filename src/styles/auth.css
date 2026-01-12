@@ -1,0 +1,66 @@
+/*==========AUTH LOADING============*/
+.auth-loading {
+  padding: 3rem;
+  text-align: center;
+  color: #94a3b8;
+}
+
+
+/* AUTH FORMS */
+
+.auth-card input {
+  width: 100%;
+  padding: 0.7rem 0.9rem;
+  margin-bottom: 0.75rem;
+  border-radius: 10px;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-surface);
+  color: var(--text-main);
+}
+
+.auth-card input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.auth-divider {
+  margin: 1.25rem 0;
+  text-align: center;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  position: relative;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  width: 40%;
+  height: 1px;
+  background: var(--border-subtle);
+}
+
+.auth-divider::before {
+  left: 0;
+}
+.auth-divider::after {
+  right: 0;
+}
+
+/* GOOGLE BUTTON */
+.btn.google {
+  background: #ffffff;
+  color: #020617;
+  border: 1px solid #e5e7eb;
+  font-weight: 600;
+}
+
+.btn.google:hover {
+  background: #f8fafc;
+}
+
+.auth-switch {
+  margin-top: 1rem;
+  font-size: 0.85rem;
+}
