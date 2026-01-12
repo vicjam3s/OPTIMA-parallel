@@ -105,6 +105,7 @@ body {
   justify-content: space-between;
 }
 .navbar-brand {
+  font-family: berlin sans fb;
   font-size: 1.5rem;
   font-weight: 800;
   letter-spacing: 1px;

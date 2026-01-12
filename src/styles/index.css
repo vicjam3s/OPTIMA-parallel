@@ -267,13 +267,13 @@ span{
   align-items: center;
   justify-content: space-between;
 }
-.navbar-brand {
+/* .navbar-brand {
   font-size: 1.5rem;
-  font-weight: 800;
+  font-weight: 1400;
   letter-spacing: 1px;
   color: #818cf8;
   text-decoration: none;
-}
+} */
 /* ================= BUTTONS ================= */
 
 .btn {
