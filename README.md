@@ -68,7 +68,7 @@ optima/
    npm run dev
    ```
 
-The app will run locally on the port provided by Vite (usually `http://localhost:5173`).
+The app will run locally on the port provided by Vite (usually `http://localhost:5173`), but using the live url from deployment, will run on project/vercel.com
 
 ---
 
@@ -89,6 +89,7 @@ The app will run locally on the port provided by Vite (usually `http://localhost
 * Debugging build and dependency issues
 * Styling consistency across different screen sizes
 * Optimizing performance while keeping the codebase readable
+* Infinite re-rendering 
 
 Each challenge helped reinforce best practices in React development and project organization.
 
@@ -101,17 +102,6 @@ Each challenge helped reinforce best practices in React development and project 
 * Advanced filtering and search
 * Dark mode support
 * Performance optimizations
-
----
-
-## 🤝 Contributing
-
-Contributions are welcome!
-
-1. Fork the repository
-2. Create a new branch (`feature/your-feature-name`)
-3. Commit your changes
-4. Open a Pull Request
 
 ---
 
