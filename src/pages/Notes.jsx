@@ -30,6 +30,7 @@ export default function Notes() {
   const lastEditRef = useRef(0);
   const isDirtyRef = useRef(false);
   const idleSaveTimeout = useRef(null);
+  const checkIdleRef = useRef(null);
 
   /* ---------- REALTIME LOAD ---------- */
   useEffect(() => {
@@ -43,7 +44,13 @@ export default function Notes() {
         ...d.data(),
       }));
 
-      setNotes(data);
+      setNotes((prevNotes) => {
+        // Only update if the data actually changed
+        if (JSON.stringify(prevNotes) === JSON.stringify(data)) {
+          return prevNotes;
+        }
+        return data;
+      });
 
       if (!activeId && data.length) {
         setActiveId(data[0].id);
@@ -51,7 +58,7 @@ export default function Notes() {
     });
 
     return () => unsub();
-  }, [user]);
+  }, [user, activeId]);
 
   /* ---------- SYNC ACTIVE NOTE TO LOCAL ---------- */
   useEffect(() => {
@@ -65,26 +72,19 @@ export default function Notes() {
   }, [activeId, notes]);
 
   /* ---------- IDLE SAVE LOGIC ---------- */
-  const markDirtyAndScheduleSave = () => {
-    if (!user || !activeId) return;
-
-    isDirtyRef.current = true;
-    lastEditRef.current = Date.now();
-
-    if (idleSaveTimeout.current) return;
-
+  useEffect(() => {
     const checkIdle = async () => {
       const elapsed = Date.now() - lastEditRef.current;
 
       if (elapsed < IDLE_SAVE_DELAY) {
-        idleSaveTimeout.current = setTimeout(
+        checkIdleRef.current = setTimeout(
           checkIdle,
           IDLE_CHECK_INTERVAL
         );
         return;
       }
 
-      if (isDirtyRef.current) {
+      if (isDirtyRef.current && activeId && user) {
         await updateDoc(
           doc(db, "users", user.uid, "notes", activeId),
           {
@@ -99,11 +99,28 @@ export default function Notes() {
         setTimeout(() => setLastSaved(""), 1500);
       }
 
-      idleSaveTimeout.current = null;
+      checkIdleRef.current = null;
     };
 
+    checkIdleRef.current = checkIdle;
+  }, [user, activeId, localTitle, localContent]);
+
+  const markDirtyAndScheduleSave = () => {
+    if (!user || !activeId) return;
+
+    isDirtyRef.current = true;
+    lastEditRef.current = Date.now();
+
+    if (idleSaveTimeout.current) {
+      clearTimeout(idleSaveTimeout.current);
+    }
+
     idleSaveTimeout.current = setTimeout(
-      checkIdle,
+      () => {
+        if (checkIdleRef.current) {
+          checkIdleRef.current();
+        }
+      },
       IDLE_CHECK_INTERVAL
     );
   };
