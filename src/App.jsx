@@ -26,14 +26,14 @@ import Settings from "./pages/Settings";
 export default function App() {
   const location = useLocation();
 
-  // ✅ FIX: get user from AuthContext
+  // FIX: get user from AuthContext
   const { user, loading } = useAuth();
 
   // Routes where sidebar & back-to-top should NOT show
   const hideUIRoutes = ["/", "/login", "/signup"];
   const showFeatureUI = !hideUIRoutes.includes(location.pathname);
 
-  // ✅ Prevent blank screen during auth check
+  // Prevent blank screen during auth check
   if (loading) {
     return <div className="auth-loading">Loading…</div>;
   }

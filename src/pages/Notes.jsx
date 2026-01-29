@@ -11,7 +11,8 @@ import {
 import { db } from "../firebase";
 import { useAuth } from "../context/AuthContext";
 
-const SAVE_DELAY = 500; // debounce ms
+const IDLE_SAVE_DELAY = 4000; // 4s after typing stops
+const IDLE_CHECK_INTERVAL = 500;
 
 export default function Notes() {
   const { user } = useAuth();
@@ -21,7 +22,14 @@ export default function Notes() {
   const [search, setSearch] = useState("");
   const [lastSaved, setLastSaved] = useState("");
 
-  const saveTimeout = useRef(null);
+  // LOCAL EDITOR STATE (NO LAG)
+  const [localTitle, setLocalTitle] = useState("");
+  const [localContent, setLocalContent] = useState("");
+
+  // REFS FOR IDLE SAVE
+  const lastEditRef = useRef(0);
+  const isDirtyRef = useRef(false);
+  const idleSaveTimeout = useRef(null);
 
   /* ---------- REALTIME LOAD ---------- */
   useEffect(() => {
@@ -36,13 +44,69 @@ export default function Notes() {
       }));
 
       setNotes(data);
-      if (!activeId && data.length > 0) {
+
+      if (!activeId && data.length) {
         setActiveId(data[0].id);
       }
     });
 
     return () => unsub();
   }, [user]);
+
+  /* ---------- SYNC ACTIVE NOTE TO LOCAL ---------- */
+  useEffect(() => {
+    const note = notes.find((n) => n.id === activeId);
+    if (!note) return;
+
+    setLocalTitle(note.title || "");
+    setLocalContent(note.content || "");
+
+    isDirtyRef.current = false;
+  }, [activeId, notes]);
+
+  /* ---------- IDLE SAVE LOGIC ---------- */
+  const markDirtyAndScheduleSave = () => {
+    if (!user || !activeId) return;
+
+    isDirtyRef.current = true;
+    lastEditRef.current = Date.now();
+
+    if (idleSaveTimeout.current) return;
+
+    const checkIdle = async () => {
+      const elapsed = Date.now() - lastEditRef.current;
+
+      if (elapsed < IDLE_SAVE_DELAY) {
+        idleSaveTimeout.current = setTimeout(
+          checkIdle,
+          IDLE_CHECK_INTERVAL
+        );
+        return;
+      }
+
+      if (isDirtyRef.current) {
+        await updateDoc(
+          doc(db, "users", user.uid, "notes", activeId),
+          {
+            title: localTitle,
+            content: localContent,
+            updatedAt: serverTimestamp(),
+          }
+        );
+
+        isDirtyRef.current = false;
+        setLastSaved("Saved");
+        setTimeout(() => setLastSaved(""), 1500);
+      }
+
+      idleSaveTimeout.current = null;
+    };
+
+    idleSaveTimeout.current = setTimeout(
+      checkIdle,
+      IDLE_CHECK_INTERVAL
+    );
+  };
 
   /* ---------- CREATE ---------- */
   const createNote = async () => {
@@ -69,26 +133,6 @@ export default function Notes() {
     if (id === activeId) setActiveId(null);
   };
 
-  /* ---------- UPDATE (DEBOUNCED) ---------- */
-  const updateNote = (fields) => {
-    if (!user || !activeId) return;
-
-    clearTimeout(saveTimeout.current);
-
-    saveTimeout.current = setTimeout(async () => {
-      await updateDoc(
-        doc(db, "users", user.uid, "notes", activeId),
-        {
-          ...fields,
-          updatedAt: serverTimestamp(),
-        }
-      );
-
-      setLastSaved("Saved");
-      setTimeout(() => setLastSaved(""), 1200);
-    }, SAVE_DELAY);
-  };
-
   /* ---------- PIN ---------- */
   const togglePin = async (id, pinned) => {
     if (!user) return;
@@ -99,16 +143,12 @@ export default function Notes() {
     });
   };
 
-  const activeNote = notes.find((n) => n.id === activeId);
-
   /* ---------- SEARCH + SORT ---------- */
   const filteredNotes = useMemo(() => {
+    const q = search.toLowerCase();
+
     return notes
-      .filter(
-        (n) =>
-          n.title.toLowerCase().includes(search.toLowerCase()) ||
-          n.content.toLowerCase().includes(search.toLowerCase())
-      )
+      .filter((n) => n.title.toLowerCase().includes(q))
       .sort((a, b) =>
         a.pinned === b.pinned
           ? (b.updatedAt?.seconds || 0) -
@@ -117,10 +157,37 @@ export default function Notes() {
       );
   }, [notes, search]);
 
+  //-------------Delete logic-------------
+  const deleteActiveNote = async () => {
+  if (!activeId) return;
+
+  const confirmDelete = window.confirm(
+    "Are you sure you want to delete this note?"
+  );
+  if (!confirmDelete) return;
+
+  // cancel pending idle save
+  if (idleSaveTimeout.current) {
+    clearTimeout(idleSaveTimeout.current);
+    idleSaveTimeout.current = null;
+  }
+
+  isDirtyRef.current = false;
+
+  await deleteDoc(
+    doc(db, "users", user.uid, "notes", activeId)
+  );
+
+  setActiveId(null);
+  setLocalTitle("");
+  setLocalContent("");
+};
+
+
   return (
     <div className="notes-page">
       <h1>📝 Notes</h1>
-      <p className="muted">Autosaved to your account.</p>
+      <p className="muted">Autosaved after you pause typing.</p>
 
       <div className="notes-layout">
         {/* SIDEBAR */}
@@ -171,28 +238,30 @@ export default function Notes() {
 
         {/* EDITOR */}
         <main className="notes-editor">
-          {activeNote ? (
+          {activeId ? (
             <>
               <input
                 className="notes-title"
-                value={activeNote.title}
-                onChange={(e) =>
-                  updateNote({ title: e.target.value })
-                }
+                value={localTitle}
+                onChange={(e) => {
+                  setLocalTitle(e.target.value);
+                  markDirtyAndScheduleSave();
+                }}
               />
 
               <textarea
                 className="notes-input"
                 placeholder="Start writing…"
-                value={activeNote.content}
-                onChange={(e) =>
-                  updateNote({ content: e.target.value })
-                }
+                value={localContent}
+                onChange={(e) => {
+                  setLocalContent(e.target.value);
+                  markDirtyAndScheduleSave();
+                }}
               />
 
               <div className="notes-footer">
                 <span className="muted">
-                  {lastSaved || "Autosaving…"}
+                  {lastSaved || "Idle saving…"}
                 </span>
               </div>
             </>
@@ -204,6 +273,7 @@ export default function Notes() {
     </div>
   );
 }
+
 
 
 
